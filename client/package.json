@@ -1,0 +1,69 @@
+{
+    "name": "client",
+    "version": "0.1.0",
+    "private": true,
+    "dependencies": {
+        "@date-io/date-fns": "^2.10.8",
+        "@material-ui/core": "^4.11.3",
+        "@material-ui/data-grid": "^4.0.0-alpha.27",
+        "@material-ui/icons": "^4.11.2",
+        "@material-ui/lab": "^4.0.0-alpha.58",
+        "@material-ui/pickers": "^3.3.10",
+        "@material-ui/x-grid-data-generator": "^4.0.0-alpha.27",
+        "@testing-library/jest-dom": "^5.11.10",
+        "@testing-library/react": "^11.2.6",
+        "@testing-library/user-event": "^12.8.3",
+        "axios": "^0.21.1",
+        "bootstrap": "^4.6.0",
+        "moment": "^2.29.1",
+        "react": "^17.0.2",
+        "react-animation": "^1.2.2",
+        "react-animations": "^1.0.0",
+        "react-bootstrap": "^1.6.0",
+        "react-bootstrap-4-pagination": "^1.0.4",
+        "react-bootstrap-sweetalert": "^5.2.0",
+        "react-date-picker": "^8.1.1",
+        "react-dom": "^17.0.2",
+        "react-modal": "^3.13.1",
+        "react-moment": "^1.1.1",
+        "react-redux": "^7.2.3",
+        "react-router-dom": "^5.2.0",
+        "react-scripts": "4.0.3",
+        "react-scroll": "^1.8.2",
+        "react-simple-animate": "^3.3.12",
+        "react-text-truncate": "^0.16.0",
+        "redux": "^4.0.5",
+        "redux-devtools-extension": "^2.13.9",
+        "redux-thunk": "^2.3.0",
+        "sweetalert": "^2.1.2",
+        "sweetalert2": "^11.0.11",
+        "sweetalert2-react-content": "^4.0.1",
+        "uuid": "^8.3.2",
+        "web-vitals": "^1.1.1"
+    },
+    "scripts": {
+        "start": "react-scripts start",
+        "build": "react-scripts build",
+        "test": "react-scripts test",
+        "eject": "react-scripts eject"
+    },
+    "eslintConfig": {
+        "extends": [
+            "react-app",
+            "react-app/jest"
+        ]
+    },
+    "browserslist": {
+        "production": [
+            ">0.2%",
+            "not dead",
+            "not op_mini all"
+        ],
+        "development": [
+            "last 1 chrome version",
+            "last 1 firefox version",
+            "last 1 safari version"
+        ]
+    },
+    "proxy": "http://localhost:5000"
+}

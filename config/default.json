@@ -1,0 +1,5 @@
+{
+
+    "mongoURI" : "mongodb://localhost/weekly_timesheet",
+    "jwtSecret" : "myjsonwebtokensecret"
+}
