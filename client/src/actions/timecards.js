@@ -151,16 +151,15 @@ export const addTimecard = (formData) => async (dispatch) => {
 };
 
 //Approve timecard
-export const approveTimecard = (status, id) => async (dispatch) => {
+export const approveTimecard = (status, id, total) => async (dispatch) => {
   try {
     const config = {
       headers: {
         "Content-Type": "application/json",
       },
     };
-    const body = JSON.stringify({ status });
+    const body = JSON.stringify({ status , total});
     const res = await axios.put(`/api/timecards/approve/${id}`, body, config);
-    console.log(res.data);
     dispatch({
       type: APPROVE_TIMECARD,
       payload: res.data,

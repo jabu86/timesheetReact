@@ -1,8 +1,8 @@
 import React, { useState } from "react";
 import { Form, Button } from "react-bootstrap";
 import { connect } from "react-redux";
-import {addTimecardFriday} from "../../../actions/timecards";
-function FridayForm({ timecard_id, addTimecardFriday }) {
+import { addTimecardFriday } from "../../../actions/timecards";
+function FridayForm({ timecard_id, addTimecardFriday, status }) {
   const [formData, setFormData] = useState({
     hours: "",
     description: "",
@@ -54,9 +54,13 @@ function FridayForm({ timecard_id, addTimecardFriday }) {
           onChange={(e) => onChange(e)}
         />
       </Form.Group>
-      <Button variant="primary" size="lg" type="submit">
-        Submit
-      </Button>
+      {status ? (
+        "timecard approved"
+      ) : (
+        <Button variant="primary" size="small" type="submit">
+          Save
+        </Button>
+      )}
     </Form>
   );
 }

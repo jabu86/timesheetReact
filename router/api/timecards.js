@@ -201,7 +201,8 @@ router.delete("/:id", auth, async (req, res) => {
 //@desc     Update status true  timecards
 //@access   Private
 router.put("/approve/:id", auth, async (req, res) => {
-  const { status } = req.body;
+  const { status, total } = req.body;
+
   try {
     //Get the logged in user
     const userLoggedIn = await User.findById({ _id: req.user.id });
@@ -212,6 +213,7 @@ router.put("/approve/:id", auth, async (req, res) => {
     //Set status true
     const timecard = await TimeCard.findById({ _id: req.params.id });
     timecard.status = Boolean(status);
+    timecard.total_hours = total;
     //Notifications
     const notification = await new Notification({
       timcard: timecard._id,

@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Form, Button } from "react-bootstrap";
 import { connect } from "react-redux";
 import { addTimecardSunday } from "../../../actions/timecards";
-function SundayForm({ timecard_id, addTimecardSunday }) {
+function SundayForm({ timecard_id, addTimecardSunday,status }) {
   const [formData, setFormData] = useState({
     hours: "",
     description: "",
@@ -54,9 +54,13 @@ function SundayForm({ timecard_id, addTimecardSunday }) {
           onChange={(e) => onChange(e)}
         />
       </Form.Group>
-      <Button variant="primary" size="lg" type="submit">
-        Submit
-      </Button>
+      {status ? (
+        "timecard approved"
+      ) : (
+        <Button variant="primary" size="small" type="submit">
+          Save
+        </Button>
+      )}
     </Form>
   );
 }

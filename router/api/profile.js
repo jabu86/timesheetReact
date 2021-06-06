@@ -236,11 +236,9 @@ router.post("/upload", auth, async (req, res) => {
     //return console.log(user);
     if (user.id == req.user.id) {
       if (!req.files || Object.keys(req.files).length === 0) {
-        return res
-          .status(400)
-          .json({
-            msg: "No file uploaded!  Please select an user profile image.",
-          });
+        return res.status(400).json({
+          msg: "No file uploaded!  Please select an user profile image.",
+        });
       }
       // The name of the input field (i.e. "sampleFile") is used to retrieve the uploaded file
       const file = req.files.file;
@@ -256,6 +254,7 @@ router.post("/upload", auth, async (req, res) => {
           msg: "File upload success",
           fileName: file.name,
           filePath: `/images/${file.name}`,
+          user,
         });
       });
     } else {

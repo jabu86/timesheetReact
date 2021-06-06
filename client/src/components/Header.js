@@ -78,14 +78,10 @@ function Header({
                 <a
                   href="#"
                   onClick={(e) => markAsRead(noti._id)}
-                  className="btn btn-primary btn-sm float-right mb-2"
+                  className="btn btn-primary btn-sm"
                 >
                   Mark As Read
                 </a>
-                <br></br>
-                <br></br>
-                <br></br>
-                <br></br>
               </NavDropdown.Item>
             ))
           ) : (

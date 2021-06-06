@@ -154,7 +154,7 @@ export const logout = () => (dispatch) => {
 
 //Image Upload
 
-export const imageUpload = (file) => async (dispatch) => {
+export const imageUpload = (file, _id) => async (dispatch) => {
   const formData = new FormData();
   formData.append("file", file);
   try {
@@ -167,7 +167,7 @@ export const imageUpload = (file) => async (dispatch) => {
     dispatch(setAlert(res.data.msg, "success", 2000));
     dispatch({
       type: IMAGE_UPLOAD_SUSSESS,
-      payload: { fileName, filePath },
+      payload:  res.data.user,
     });
   } catch (err) {
     const errors = err.response.data;

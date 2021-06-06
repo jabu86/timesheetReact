@@ -3,13 +3,14 @@ import mongoose from "mongoose";
 const TimeCardSchema = new mongoose.Schema(
   {
     user: { type: mongoose.Schema.Types.ObjectId, ref: "user" },
-    name: { type: String,  required: true },
+    name: { type: String, required: true },
     project: { type: String, required: true },
-    company: { type: String,  required: true },
-    status: { type: Boolean , default : false},
+    company: { type: String, required: true },
+    status: { type: Boolean, default: false },
     from: { type: Date, required: true },
-    to: { type: Date, required : true },
-    description: { type: String , required: true},
+    to: { type: Date, required: true },
+    description: { type: String, required: true },
+    total_hours: { type: Number, default: 0, required: true },
     monday: [
       {
         hours: {
@@ -20,7 +21,8 @@ const TimeCardSchema = new mongoose.Schema(
           type: String,
           required: true,
         },
-      },{ timestamps: true },
+      },
+      { timestamps: true },
     ],
     tuesday: [
       {
@@ -32,7 +34,8 @@ const TimeCardSchema = new mongoose.Schema(
           type: String,
           required: true,
         },
-      },{ timestamps: true },
+      },
+      { timestamps: true },
     ],
     wendsday: [
       {
@@ -44,7 +47,8 @@ const TimeCardSchema = new mongoose.Schema(
           type: String,
           required: true,
         },
-      },{ timestamps: true },
+      },
+      { timestamps: true },
     ],
     thursday: [
       {
@@ -56,7 +60,8 @@ const TimeCardSchema = new mongoose.Schema(
           type: String,
           required: true,
         },
-      },{ timestamps: true },
+      },
+      { timestamps: true },
     ],
     friday: [
       {
@@ -68,7 +73,8 @@ const TimeCardSchema = new mongoose.Schema(
           type: String,
           required: true,
         },
-      },{ timestamps: true },
+      },
+      { timestamps: true },
     ],
     satarday: [
       {
@@ -80,7 +86,8 @@ const TimeCardSchema = new mongoose.Schema(
           type: String,
           required: true,
         },
-      },{ timestamps: true },
+      },
+      { timestamps: true },
     ],
     sunday: [
       {
@@ -92,12 +99,12 @@ const TimeCardSchema = new mongoose.Schema(
           type: String,
           required: true,
         },
-      },{ timestamps: true },
+      },
+      { timestamps: true },
     ],
   },
   { timestamps: true }
 );
 
-
-const TimeCard = mongoose.model('timecard', TimeCardSchema);
+const TimeCard = mongoose.model("timecard", TimeCardSchema);
 export default TimeCard;

@@ -35,7 +35,7 @@ function ProfileTop({
   //Upload image
   const onSubmit = async (e) => {
     e.preventDefault();
-    imageUpload(file);
+    imageUpload(file, _id);
   };
   return (
     <Fragment>

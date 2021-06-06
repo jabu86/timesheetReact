@@ -55,7 +55,7 @@ export default function (state = initialState, action) {
       return {
         ...state,
         isAuthenticated: true,
-        user: (state.user.image = payload.filePath),
+        user: { ...(state.user = payload) },
         loading: false,
       };
     case REGISTER_SUCCESS:
