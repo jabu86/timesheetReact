@@ -3,7 +3,7 @@ import Grid from "@material-ui/core/Grid";
 import Typography from "@material-ui/core/Typography";
 import Container from "@material-ui/core/Container";
 import { makeStyles } from "@material-ui/core/styles";
-import { connect } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import { getUserTimecards } from "../../actions/timecards";
 import Spiner from "../Spiner";
 import AllTimeCards from "./AllTimeCards";
@@ -35,67 +35,42 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-function UserTimeCard({
-  getUserTimecards,
-  timecard: { timecards, filteredTimecards, loading },
-  auth: { user },
-  match,
-}) {
+function UserTimeCard() {
   const classes = useStyles();
-  const [currentPage, setCurrentPage] = useState(1);
-  const [timecardPerPage] = useState(6);
-  //Get current timecard
-  const indexOfLastTimecard = currentPage * timecardPerPage;
-  const indexOfFirstTimecard = indexOfLastTimecard - timecardPerPage;
-  const currentTimecard = filteredTimecards.slice(
-    indexOfFirstTimecard,
-    indexOfLastTimecard
-  );
-  const paginate = (pageNumber) => setCurrentPage(pageNumber);
+  const dispatch = useDispatch();
+  const auth = useSelector((state) => state.auth);
+  const timecardList = useSelector((state) => state.timecardList);
+  const { loading, error, timecards, filteredTimecards } = timecardList;
+  const { isAuthenticated, user } = auth;
   useEffect(() => {
-    getUserTimecards(user._id);
-  }, [getUserTimecards, user._id]);
+    dispatch(getUserTimecards(user._id));
+  }, [dispatch, getUserTimecards, user._id]);
   return (
     <Fragment>
       <Container className={classes.cardGrid} maxWidth="md">
         <Grid container spacing={1}>
           {loading ? (
             <Spiner />
-          ) : timecards.length <= 0 || timecards === undefined ? (
-            <Fragment>
-              <Typography variant="h6">
-                You have no Timecard's! click<a href="/timecard">here</a>to
-                create
-              </Typography>
-            </Fragment>
+          ) : error ? (
+            <h3>{error}</h3>
           ) : (
-            <Fragment>
+            <>
               <Grid item xs={12}>
-                <AddTimeCard />
+                {isAuthenticated ? <AddTimeCard /> : ""}
                 <br />
                 <Filter />
               </Grid>
+
               {filteredTimecards &&
-                filteredTimecards !== null &&
-                currentTimecard.map((timecard) => (
+                filteredTimecards.map((timecard) => (
                   <AllTimeCards timecard={timecard} key={timecard._id} />
                 ))}
-            </Fragment>
+            </>
           )}
-        </Grid>
-        <Grid item>
-          <Pagination
-            timeCardPerPage={timecardPerPage}
-            totalTimeCards={filteredTimecards.length}
-            paginate={paginate}
-          />
         </Grid>
       </Container>
     </Fragment>
   );
 }
-const mapStateToProps = (state) => ({
-  timecard: state.timecard,
-  auth: state.auth,
-});
-export default connect(mapStateToProps, { getUserTimecards })(UserTimeCard);
+
+export default UserTimeCard;

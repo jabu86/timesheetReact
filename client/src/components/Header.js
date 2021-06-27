@@ -75,13 +75,13 @@ function Header({
                 <Typography component="p" className="float-right">
                   {moment(noti.createdAt).calendar()}
                 </Typography>
-                <a
-                  href="#"
+                <Link
+                  to="#"
                   onClick={(e) => markAsRead(noti._id)}
                   className="btn btn-primary btn-sm"
                 >
                   Mark As Read
-                </a>
+                </Link>
               </NavDropdown.Item>
             ))
           ) : (

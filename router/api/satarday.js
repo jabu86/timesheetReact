@@ -29,6 +29,10 @@ router.post(
     check("description", "Describe what you worked on a task is required")
       .not()
       .isEmpty(),
+    check(
+      "description",
+      "Describe what you worked on a task is required"
+    ).isLength({ max: 500 }),
   ],
   async (req, res) => {
     const errors = validationResult(req);
@@ -68,6 +72,10 @@ router.put(
     check("description", "Describe what you worked on a task is required")
       .not()
       .isEmpty(),
+    check(
+      "description",
+      "Describe what you worked on a task is required"
+    ).isLength({ max: 500 }),
   ],
   async (req, res) => {
     const errors = validationResult(req);

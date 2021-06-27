@@ -30,6 +30,10 @@ router.post(
     check("description", "Describe what you worked on a task is required")
       .not()
       .isEmpty(),
+    check(
+      "description",
+      "Describe what you worked on a task is required"
+    ).isLength({ max: 500 }),
   ],
   async (req, res) => {
     const errors = validationResult(req);
@@ -69,6 +73,10 @@ router.put(
     check("description", "Describe what you worked on a task is required")
       .not()
       .isEmpty(),
+    check(
+      "description",
+      "Describe what you worked on a task is required"
+    ).isLength({ max: 500 }),
   ],
   async (req, res) => {
     const errors = validationResult(req);
@@ -81,22 +89,24 @@ router.put(
       if (timecard.user.toString() !== req.user.id) {
         res.status(404).json({ msg: "User not autorized" });
       } else {
-
-        const update ={$set :{
-            "tuesday.$.hours" : hours,
-            "tuesday.$.description" : description
-            }
+        const update = {
+          $set: {
+            "tuesday.$.hours": hours,
+            "tuesday.$.description": description,
+          },
         };
-        await TimeCard.updateOne({
+        await TimeCard.updateOne(
+          {
             _id: req.params.id,
-            "tuesday._id": req.params.tues_id
-        }, update, (err, respond) => {
-            if(err) return console.log(err);
+            "tuesday._id": req.params.tues_id,
+          },
+          update,
+          (err, respond) => {
+            if (err) return console.log(err);
             res.json(timecard.tuesday);
             console.log(respond);
-        });
-
-
+          }
+        );
       }
     } catch (error) {
       console.error(error.message);

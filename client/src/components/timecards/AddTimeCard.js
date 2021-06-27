@@ -7,6 +7,7 @@ import {
   Typography,
   TextField,
 } from "@material-ui/core";
+import Bounce from 'react-reveal/Flip';
 import AddBoxIcon from "@material-ui/icons/AddBox";
 import Modal from "react-modal";
 import HighlightOffIcon from "@material-ui/icons/HighlightOff";
@@ -15,7 +16,6 @@ import InputLabel from "@material-ui/core/InputLabel";
 import FormControl from "@material-ui/core/FormControl";
 import { connect } from "react-redux";
 import { addTimecard } from "../../actions/timecards";
-import { Link } from "react-router-dom";
 import { animations } from "react-animation";
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -53,11 +53,7 @@ const customStyles = {
     transform: "translate(-50%, -50%)",
   },
 };
-function AddTimeCard({
-  auth: { isAuthenticated },
-  addTimecard,
-  timecard: { error },
-}) {
+function AddTimeCard({ addTimecard }) {
   const classes = useStyles();
   const [modalIsOpen, setlIsOpen] = useState(false);
   const [formData, setFormData] = useState({
@@ -83,9 +79,6 @@ function AddTimeCard({
   const onSubmit = (e) => {
     e.preventDefault();
     addTimecard(formData);
-    if (error || error.status === 400) {
-      setlIsOpen(true);
-    }
     setFormData({
       company: "",
       project: "",
@@ -97,7 +90,7 @@ function AddTimeCard({
   };
   return (
     <Fragment>
-      {isAuthenticated ? (
+      <Bounce cascade top>
         <Paper className="dashboard-header">
           <Typography>Create you'r weekly timesheet click </Typography>
 
@@ -208,13 +201,7 @@ function AddTimeCard({
             </form>
           </Modal>
         </Paper>
-      ) : (
-        <Fragment>
-          <Typography variant="h6">
-            Login to create timecard <Link to="/login">here</Link>
-          </Typography>
-        </Fragment>
-      )}
+      </Bounce>
     </Fragment>
   );
 }

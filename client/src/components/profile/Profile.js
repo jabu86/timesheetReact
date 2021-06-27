@@ -8,8 +8,10 @@ import ProfileTop from "./ProfileTop";
 import ProfileAbout from "./ProfileAbout";
 import ProfileExperience from "./ProfileExperience";
 import ProfileEducation from "./ProfileEducation";
-import { Box, Button, Paper, Typography } from "@material-ui/core";
+import { Box, Paper, Typography } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
+import Bounce from "react-reveal/Bounce";
+import { Link } from "react-router-dom";
 
 const useStyles = makeStyles((theme) => ({
   cardGrid: {
@@ -52,25 +54,32 @@ function Profile({
         <Fragment>
           <Container className={classes.cardGrid}>
             <Box component="div" className={classes.probtn}>
-              <Button
-                variant="contained"
-                color="secondary"
-                href="/profiles"
-                m={1}
-              >
-                Back
-              </Button>
               {auth.isAuthenticated &&
                 auth.loading === false &&
                 auth.user._id === profile.user._id && (
-                  <Button
-                    href="/edit-profile"
-                    variant="contained"
-                    color="primary"
-                  >
-                    Edit Profile
-                  </Button>
+                  <Bounce cascade top>
+                    <Link
+                      to="/edit-profile"
+                      variant="contained"
+                      color="primary"
+                      className="btn btn-primary"
+                    >
+                      Edit Profile
+                    </Link>
+                  </Bounce>
                 )}
+
+              <Bounce cascade top>
+                {" "}
+                <Link
+                  variant="contained"
+                  color="primary"
+                  className="btn btn-secondary"
+                  to="/profiles"
+                >
+                  Back
+                </Link>
+              </Bounce>
             </Box>
 
             <Grid container spacing={1}>

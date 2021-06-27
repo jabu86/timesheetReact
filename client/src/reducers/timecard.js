@@ -1,7 +1,15 @@
 import {
+  GET_TIMECARDS_REQUEST,
   GET_TIMECARDS,
   TIMECARDS_ERROR,
-  CREATE_TIMECARD,
+  GET_TIMECARD,
+  GET_TIMECARD_REQUEST,
+  TIMECARD_ERROR,
+  APPROVE_TIMECARD,
+  CREATE_TIMECARD_SUCCESS,
+  CREATE_TIMECARD_ERROR,
+  DELETE_TIMECARD,
+  UPDATE_TIMECARD,
   CREATE_TIMECARD_HOURS,
   CREATE_TIMECARD_TUESDAY_HOURS,
   CREATE_TIMECARD_WENDSDAY_HOURS,
@@ -9,8 +17,6 @@ import {
   CREATE_TIMECARD_FRIDAY_HOURS,
   CREATE_TIMECARD_SATARDAY_HOURS,
   CREATE_TIMECARD_SUNDAY_HOURS,
-  GET_TIMECARD,
-  GET_TIMECARD_HOURS,
   DELETE_MONDAY_TIMECARD_HOURS,
   DELETE_TUESDAY_TIMECARD_HOURS,
   DELETE_WENDSDAY_TIMECARD_HOURS,
@@ -18,71 +24,55 @@ import {
   DELETE_FRIDAY_TIMECARD_HOURS,
   DELETE_SATARDAY_TIMECARD_HOURS,
   DELETE_SUNDAY_TIMECARD_HOURS,
-  DELETE_TIMECARD,
-  UPDATE_TIMECARD,
   SEARCH_TIMECARD,
   ORDER_TIMECARD,
-  APPROVE_TIMECARD,
 } from "../actions/types";
-const initialState = {
-  text: "",
-  timecards: [],
-  filteredTimecards: [],
-  timecard: null,
-  loading: true,
-  error: {},
-};
 
-export default function (state = initialState, action) {
-  const { type, payload } = action;
-  switch (type) {
+export const timecardReducer = (
+  state = { loading: true, timecards: [], filteredTimecards: [] },
+  action
+) => {
+  switch (action.type) {
+    case GET_TIMECARDS_REQUEST:
+      return { loading: false, timecards: [], filteredTimecards: [] };
     case GET_TIMECARDS:
       return {
-        ...state,
-        timecards: payload,
-        filteredTimecards: payload,
         loading: false,
+        timecards: action.payload,
+        filteredTimecards: action.payload,
       };
     case GET_TIMECARD:
       return {
-        ...state,
-        timecard: payload,
         loading: false,
-      };
-    case CREATE_TIMECARD:
-      return {
-        ...state,
-        timecards: [payload, ...state.timecards],
-        filteredTimecards: [payload, ...state.filteredTimecards],
-        loading: false,
+        timecard: action.payload,
       };
     case SEARCH_TIMECARD:
       return {
         ...state,
-        filteredTimecards: payload.filterValues,
-        text: payload.text,
+        filteredTimecards: action.payload,
         loading: false,
       };
     case ORDER_TIMECARD:
       return {
         ...state,
-        filteredTimecards: payload.timecards,
-        sort: payload.sort,
+        filteredTimecards: action.payload.timecards,
+        sort: action.payload.sort,
         loading: false,
       };
-    case GET_TIMECARD_HOURS:
+    case CREATE_TIMECARD_SUCCESS:
       return {
         ...state,
-        timecard: payload,
+        timecards: [action.payload, ...state.timecards],
+        filteredTimecards: [action.payload, ...state.filteredTimecards],
         loading: false,
       };
     case UPDATE_TIMECARD:
     case APPROVE_TIMECARD:
-      let index = state.filteredTimecards.findIndex(
-        (timecard) => timecard._id === payload._id
+      let index = state.timecards.findIndex(
+        (timecard) => timecard._id === action.payload._id
       );
-      let timecards = [...state.filteredTimecards];
-      timecards[index] = { ...(timecards[index] = payload) };
+      let timecards = [...state.timecards];
+      timecards[index] = { ...(timecards[index] = action.payload) };
       return {
         ...state,
         filteredTimecards: timecards,
@@ -92,50 +82,71 @@ export default function (state = initialState, action) {
       return {
         ...state,
         filteredTimecards: state.filteredTimecards.filter(
-          (timecard) => timecard._id !== payload
+          (timecard) => timecard._id !== action.payload
         ),
         loading: false,
+      };
+    case CREATE_TIMECARD_ERROR:
+      return { loading: false, error: action.payload };
+    case TIMECARDS_ERROR:
+      return { loading: false, error: action.payload };
+    default:
+      return state;
+  }
+};
+
+export const timecardDetailsReducer = (
+  state = { loading: true, timecard: {} },
+  action
+) => {
+  switch (action.type) {
+    case GET_TIMECARD_REQUEST:
+      return { loading: false, ...state };
+    case GET_TIMECARD:
+      return {
+        loading: false,
+        timecard: action.payload,
       };
     case CREATE_TIMECARD_HOURS:
       return {
         ...state,
-        timecard: { ...state.timecard, monday: payload },
+        timecard: { ...state.timecard, monday: action.payload },
         loading: false,
       };
     case CREATE_TIMECARD_TUESDAY_HOURS:
       return {
         ...state,
-        timecard: { ...state.timecard, tuesday: payload },
+        timecard: { ...state.timecard, tuesday: action.payload },
         loading: false,
       };
     case CREATE_TIMECARD_WENDSDAY_HOURS:
       return {
         ...state,
-        timecard: { ...state.timecard, wendsday: payload },
+        timecard: { ...state.timecard, wendsday: action.payload },
         loading: false,
       };
     case CREATE_TIMECARD_THURSDAY_HOURS:
       return {
         ...state,
-        timecard: { ...state.timecard, thursday: payload },
+        timecard: { ...state.timecard, thursday: action.payload },
         loading: false,
       };
     case CREATE_TIMECARD_FRIDAY_HOURS:
       return {
         ...state,
-        timecard: { ...state.timecard, friday: payload },
+        timecard: { ...state.timecard, friday: action.payload },
         loading: false,
       };
     case CREATE_TIMECARD_SATARDAY_HOURS:
       return {
         ...state,
-        timecard: { ...state.timecard, satarday: payload },
+        timecard: { ...state.timecard, satarday: action.payload },
         loading: false,
       };
     case CREATE_TIMECARD_SUNDAY_HOURS:
       return {
         ...state,
-        timecard: { ...state.timecard, sunday: payload },
+        timecard: { ...state.timecard, sunday: action.payload },
         loading: false,
       };
     case DELETE_MONDAY_TIMECARD_HOURS:
@@ -145,7 +156,7 @@ export default function (state = initialState, action) {
         timecard: {
           ...state.timecard,
           monday: state.timecard.monday.filter(
-            (timecard) => timecard._id !== payload
+            (timecard) => timecard._id !== action.payload
           ),
         },
       };
@@ -156,7 +167,7 @@ export default function (state = initialState, action) {
         timecard: {
           ...state.timecard,
           tuesday: state.timecard.tuesday.filter(
-            (timecard) => timecard._id !== payload
+            (timecard) => timecard._id !== action.payload
           ),
         },
       };
@@ -167,7 +178,7 @@ export default function (state = initialState, action) {
         timecard: {
           ...state.timecard,
           wendsday: state.timecard.wendsday.filter(
-            (timecard) => timecard._id !== payload
+            (timecard) => timecard._id !== action.payload
           ),
         },
       };
@@ -178,7 +189,7 @@ export default function (state = initialState, action) {
         timecard: {
           ...state.timecard,
           thursday: state.timecard.thursday.filter(
-            (timecard) => timecard._id !== payload
+            (timecard) => timecard._id !== action.payload
           ),
         },
       };
@@ -189,7 +200,7 @@ export default function (state = initialState, action) {
         timecard: {
           ...state.timecard,
           friday: state.timecard.friday.filter(
-            (timecard) => timecard._id !== payload
+            (timecard) => timecard._id !== action.payload
           ),
         },
       };
@@ -200,7 +211,7 @@ export default function (state = initialState, action) {
         timecard: {
           ...state.timecard,
           satarday: state.timecard.satarday.filter(
-            (timecard) => timecard._id !== payload
+            (timecard) => timecard._id !== action.payload
           ),
         },
       };
@@ -211,19 +222,13 @@ export default function (state = initialState, action) {
         timecard: {
           ...state.timecard,
           sunday: state.timecard.sunday.filter(
-            (timecard) => timecard._id !== payload
+            (timecard) => timecard._id !== action.payload
           ),
         },
       };
-
-    case TIMECARDS_ERROR:
-      return {
-        ...state,
-        loading: false,
-        error: payload,
-        // timecard: null,
-      };
+    case TIMECARD_ERROR:
+      return { loading: false, error: action.payload };
     default:
       return state;
   }
-}
+};

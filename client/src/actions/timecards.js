@@ -2,11 +2,13 @@
 import axios from "axios";
 import { setAlert } from "./alert";
 import {
-  CREATE_TIMECARD,
+  CREATE_TIMECARD_SUCCESS,
   GET_TIMECARD,
   GET_TIMECARDS,
+  GET_TIMECARD_REQUEST,
+  TIMECARD_ERROR,
+  GET_TIMECARDS_REQUEST,
   TIMECARDS_ERROR,
-  GET_TIMECARD_HOURS,
   CREATE_TIMECARD_HOURS,
   UPDATE_TIMECARD,
   CREATE_TIMECARD_TUESDAY_HOURS,
@@ -30,6 +32,7 @@ import {
 
 //Get timecards
 export const getTimecards = () => async (dispatch) => {
+  dispatch({ type: GET_TIMECARDS_REQUEST });
   try {
     const res = await axios.get("/api/timecards");
     dispatch({
@@ -39,16 +42,17 @@ export const getTimecards = () => async (dispatch) => {
   } catch (err) {
     dispatch({
       type: TIMECARDS_ERROR,
-      payload: {
-        msg: err.response.statusText,
-        status: err.response.status,
-      },
+      payload:
+        err.response && err.response.data.msg
+          ? err.response.data.msg
+          : err.response.data,
     });
   }
 };
 
 //Get user timecards
 export const getUserTimecards = (user_id) => async (dispatch) => {
+  dispatch({ type: GET_TIMECARDS_REQUEST });
   try {
     const res = await axios.get(`/api/timecards/user/${user_id}`);
     dispatch({
@@ -58,34 +62,37 @@ export const getUserTimecards = (user_id) => async (dispatch) => {
   } catch (err) {
     dispatch({
       type: TIMECARDS_ERROR,
-      payload: {
-        msg: err.response.statusText,
-        status: err.response.status,
-      },
+      payload:
+        err.response && err.response.data.msg
+          ? err.response.data.msg
+          : err.response.data,
     });
   }
 };
 
 //Get SINGLE timecard
 export const getTimecard = (id) => async (dispatch) => {
+  dispatch({ type: GET_TIMECARD_REQUEST, payload: id });
   try {
-    const res = await axios.get(`/api/timecards/${id}`);
+    const { data } = await axios.get(`/api/timecards/${id}`);
     dispatch({
       type: GET_TIMECARD,
-      payload: res.data,
+      payload: data,
     });
   } catch (err) {
+    dispatch(setAlert(err.response.data.msg, "error", 5000));
     dispatch({
-      type: TIMECARDS_ERROR,
-      payload: {
-        msg: err.response.statusText,
-        status: err.response.status,
-      },
+      type: TIMECARD_ERROR,
+      payload:
+        err.response && err.response.data.msg
+          ? err.response.data.msg
+          : err.response.data,
     });
   }
 };
 //Search Timecard
-export const searchTimecard = (timecards, text) => async (dispatch) => {
+export const searchTimecard = (text) => async (dispatch, getState) => {
+  const timecards = getState().timecardList.timecards;
   let filterValues = timecards.filter((timecard) => {
     return (
       timecard.company.toLowerCase().includes(text.toLowerCase()) ||
@@ -95,10 +102,11 @@ export const searchTimecard = (timecards, text) => async (dispatch) => {
       timecard.user.name.toLowerCase().includes(text.toLowerCase())
     );
   });
-  dispatch({ type: SEARCH_TIMECARD, payload: { filterValues, text } });
+  dispatch({ type: SEARCH_TIMECARD, payload: filterValues });
 };
 
-export const orderTimecard = (timecards, sort) => async (dispatch) => {
+export const orderTimecard = (sort) => async (dispatch, getState) => {
+  const timecards = getState().timecardList.timecards;
   if (sort !== "") {
     timecards.sort((a, b) =>
       sort === "latest"
@@ -128,10 +136,9 @@ export const addTimecard = (formData) => async (dispatch) => {
     };
     const res = await axios.post("/api/timecards", formData, config);
     dispatch({
-      type: CREATE_TIMECARD,
+      type: CREATE_TIMECARD_SUCCESS,
       payload: res.data,
     });
-    console.log(res.data);
     dispatch(setAlert("Timecard Added", "success"));
   } catch (err) {
     const errors = err.response.data.errors;
@@ -140,13 +147,6 @@ export const addTimecard = (formData) => async (dispatch) => {
         dispatch(setAlert(err.msg, "error", 5000));
       });
     }
-    dispatch({
-      type: TIMECARDS_ERROR,
-      payload: {
-        msg: err.response.statusText,
-        status: err.response.status,
-      },
-    });
   }
 };
 
@@ -158,7 +158,7 @@ export const approveTimecard = (status, id, total) => async (dispatch) => {
         "Content-Type": "application/json",
       },
     };
-    const body = JSON.stringify({ status , total});
+    const body = JSON.stringify({ status, total });
     const res = await axios.put(`/api/timecards/approve/${id}`, body, config);
     dispatch({
       type: APPROVE_TIMECARD,
@@ -173,13 +173,6 @@ export const approveTimecard = (status, id, total) => async (dispatch) => {
         dispatch(setAlert(err.msg, "error", 5000));
       });
     }
-    dispatch({
-      type: TIMECARDS_ERROR,
-      payload: {
-        msg: err.response.statusText,
-        status: err.response.status,
-      },
-    });
   }
 };
 
@@ -207,13 +200,6 @@ export const updateTimecard = (id, formData) => async (dispatch) => {
     if (err.response.data.msg) {
       dispatch(setAlert(err.response.data.msg, "error", 5000));
     }
-    dispatch({
-      type: TIMECARDS_ERROR,
-      payload: {
-        msg: err.response.statusText,
-        status: err.response.status,
-      },
-    });
   }
 };
 
@@ -265,13 +251,7 @@ export const addTimecardMonday = (id, formData) => async (dispatch) => {
     if (err.response.data.msg) {
       dispatch(setAlert(err.response.data.msg, "error", 5000));
     }
-    dispatch({
-      type: TIMECARDS_ERROR,
-      payload: {
-        msg: err.response.statusText,
-        status: err.response.status,
-      },
-    });
+   
   }
 };
 
@@ -288,7 +268,6 @@ export const addTimecardTuesday = (id, formData) => async (dispatch) => {
       type: CREATE_TIMECARD_TUESDAY_HOURS,
       payload: res.data,
     });
-    console.log(res.data);
     dispatch(setAlert("Success", "success"));
   } catch (err) {
     const errors = err.response.data.errors;
@@ -300,13 +279,6 @@ export const addTimecardTuesday = (id, formData) => async (dispatch) => {
     if (err.response.data.msg) {
       dispatch(setAlert(err.response.data.msg, "error", 5000));
     }
-    dispatch({
-      type: TIMECARDS_ERROR,
-      payload: {
-        msg: err.response.statusText,
-        status: err.response.status,
-      },
-    });
   }
 };
 
@@ -334,13 +306,6 @@ export const addTimecardWendssday = (id, formData) => async (dispatch) => {
     if (err.response.data.msg) {
       dispatch(setAlert(err.response.data.msg, "error", 5000));
     }
-    dispatch({
-      type: TIMECARDS_ERROR,
-      payload: {
-        msg: err.response.statusText,
-        status: err.response.status,
-      },
-    });
   }
 };
 
@@ -479,28 +444,6 @@ export const addTimecardSunday = (id, formData) => async (dispatch) => {
   }
 };
 
-//Get SINGLE timecard
-export const getMondayTimecard = (id) => async (dispatch) => {
-  try {
-    const res = await axios.get(`/api/monday/${id}`);
-    dispatch({
-      type: GET_TIMECARD_HOURS,
-      payload: res.data,
-    });
-  } catch (err) {
-    if (err.response.data.msg) {
-      dispatch(setAlert(err.response.data.msg, "error", 5000));
-    }
-    dispatch({
-      type: TIMECARDS_ERROR,
-      payload: {
-        msg: err.response.statusText,
-        status: err.response.status,
-      },
-    });
-  }
-};
-
 //Delete monday task timecard
 export const deleteMondayTimecard = (timecard_id, id) => async (dispatch) => {
   try {
@@ -509,6 +452,7 @@ export const deleteMondayTimecard = (timecard_id, id) => async (dispatch) => {
       type: DELETE_MONDAY_TIMECARD_HOURS,
       payload: id,
     });
+    dispatch(setAlert("Monday Removed", "success", 5000));
   } catch (err) {
     if (err.response.data.msg) {
       dispatch(setAlert(err.response.data.msg, "error", 5000));
@@ -531,6 +475,7 @@ export const deleteTuesdayTimecard = (timecard_id, id) => async (dispatch) => {
       type: DELETE_TUESDAY_TIMECARD_HOURS,
       payload: id,
     });
+    dispatch(setAlert("Tuesday Removed", "success", 5000));
   } catch (err) {
     if (err.response.data.msg) {
       dispatch(setAlert(err.response.data.msg, "error", 5000));
@@ -556,6 +501,7 @@ export const deleteWendsdayTimecard = (timecard_id, id) => async (dispatch) => {
       type: DELETE_WENDSDAY_TIMECARD_HOURS,
       payload: id,
     });
+    dispatch(setAlert("Wendsday Removed", "success", 5000));
   } catch (err) {
     if (err.response.data.msg) {
       dispatch(setAlert(err.response.data.msg, "error", 5000));
@@ -581,6 +527,7 @@ export const deleteThursdayTimecard = (timecard_id, id) => async (dispatch) => {
       type: DELETE_THURSDAY_TIMECARD_HOURS,
       payload: id,
     });
+    dispatch(setAlert("Thursday Removed", "success", 5000));
   } catch (err) {
     if (err.response.data.msg) {
       dispatch(setAlert(err.response.data.msg, "error", 5000));
@@ -606,6 +553,7 @@ export const deleteFridayTimecard = (timecard_id, id) => async (dispatch) => {
       type: DELETE_FRIDAY_TIMECARD_HOURS,
       payload: id,
     });
+    dispatch(setAlert("Friday Removed", "success", 5000));
   } catch (err) {
     if (err.response.data.msg) {
       dispatch(setAlert(err.response.data.msg, "error", 5000));
@@ -631,6 +579,7 @@ export const deleteSatardayTimecard = (timecard_id, id) => async (dispatch) => {
       type: DELETE_SATARDAY_TIMECARD_HOURS,
       payload: id,
     });
+    dispatch(setAlert("Satarday Removed", "success", 5000));
   } catch (err) {
     if (err.response.data.msg) {
       dispatch(setAlert(err.response.data.msg, "error", 5000));
@@ -656,6 +605,7 @@ export const deleteSundayTimecard = (timecard_id, id) => async (dispatch) => {
       type: DELETE_SUNDAY_TIMECARD_HOURS,
       payload: id,
     });
+    dispatch(setAlert("Sunday Removed", "success", 5000));
   } catch (err) {
     if (err.response.data.msg) {
       dispatch(setAlert(err.response.data.msg, "error", 5000));

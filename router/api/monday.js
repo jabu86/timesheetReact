@@ -30,6 +30,10 @@ router.post(
     check("description", "Describe what you worked on a task is required")
       .not()
       .isEmpty(),
+    check(
+      "description",
+      "Describe what you worked on a task is required"
+    ).isLength({ max: 500 }),
   ],
   async (req, res) => {
     const errors = validationResult(req);
@@ -69,6 +73,10 @@ router.put(
     check("description", "Describe what you worked on a task is required")
       .not()
       .isEmpty(),
+    check(
+      "description",
+      "Describe what you worked on a task is required"
+    ).isLength({ max: 500 }),
   ],
   async (req, res) => {
     const errors = validationResult(req);
@@ -125,14 +133,13 @@ router.delete("/:id/:mon_id", auth, async (req, res) => {
     if (timecard.user.toString() !== req.user.id) {
       res.status(404).json({ msg: "User not autorized" });
     }
-      //Get remove index
-      const removeIndex = timecard.monday
-        .map((item) => item.id)
-        .indexOf(req.params.mon_id);
-      timecard.monday.splice(removeIndex, 1);
-      await timecard.save();
-      res.json(timecard.monday);
-
+    //Get remove index
+    const removeIndex = timecard.monday
+      .map((item) => item.id)
+      .indexOf(req.params.mon_id);
+    timecard.monday.splice(removeIndex, 1);
+    await timecard.save();
+    res.json(timecard.monday);
   } catch (error) {
     console.error(error.message);
     res.status(500).send("Server Error");

@@ -9,6 +9,7 @@ import Typography from "@material-ui/core/Typography";
 import Container from "@material-ui/core/Container";
 import Grid from "@material-ui/core/Grid";
 import { Paper } from "@material-ui/core";
+import Fade from 'react-reveal/Fade';
 const useStyles = makeStyles((theme) => ({
   cardGrid: {
     paddingTop: theme.spacing(8),
@@ -43,30 +44,32 @@ function Profiles({ getProfiles, profile: { profiles, loading } }) {
         <Spinner />
       ) : (
         <Fragment>
-          <Container className={classes.cardGrid}>
-            <Grid container spacing={1}>
-              <Grid item xs={12}>
-                <Paper className={classes.paper}>
-                  <Typography variant="h4">
-                    <PeopleAltIcon />
-                    TimeCard User's
-                  </Typography>
-                  <Typography>Connect with other time card user's</Typography>
-                </Paper>
+          <Fade cascade bottom>
+            <Container className={classes.cardGrid}>
+              <Grid container spacing={1}>
+                <Grid item xs={12}>
+                  <Paper className={classes.paper}>
+                    <Typography variant="h4">
+                      <PeopleAltIcon />
+                      TimeCard User's
+                    </Typography>
+                    <Typography>Connect with other time card user's</Typography>
+                  </Paper>
+                </Grid>
+                {profiles.length > 0 ? (
+                  profiles.map((profile) => (
+                    <Grid item xs={12} key={profile._id}>
+                      <Paper className={classes.paper}>
+                        <ProfilesItem profile={profile} />
+                      </Paper>
+                    </Grid>
+                  ))
+                ) : (
+                  <h4>No Profiles Found</h4>
+                )}
               </Grid>
-              {profiles.length > 0 ? (
-                profiles.map((profile) => (
-                  <Grid item xs={12} key={profile._id}>
-                    <Paper className={classes.paper}>
-                      <ProfilesItem profile={profile} />
-                    </Paper>
-                  </Grid>
-                ))
-              ) : (
-                <h4>No Profiles Found</h4>
-              )}
-            </Grid>
-          </Container>
+            </Container>
+          </Fade>
         </Fragment>
       )}
     </Fragment>

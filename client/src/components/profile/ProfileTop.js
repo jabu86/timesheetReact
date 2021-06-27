@@ -4,6 +4,7 @@ import { connect } from "react-redux";
 import { imageUpload } from "../../actions/auth";
 import { Box, Button, Paper, Typography } from "@material-ui/core";
 import LanguageIcon from "@material-ui/icons/Language";
+import Fade from 'react-reveal/Fade';
 import { Form } from "react-bootstrap";
 const useStyles = makeStyles((theme) => ({
   paper: {
@@ -39,50 +40,52 @@ function ProfileTop({
   };
   return (
     <Fragment>
-      <Paper className={classes.paper}>
-        <img
-          src={image}
-          alt={name}
-          className="img-fluid img-thumbnail"
-          style={{ width: "50%", borderRadius: "0.25em" }}
-        />
-        {auth.isAuthenticated &&
-          auth.loading === false &&
-          auth.user._id === _id && (
-            <Form onSubmit={onSubmit} className="mt-2" >
-              <Form.File
-                id="custom-file-translate-scss"
-                label="Profile Picture"
-                lang="en"
-                custom
-                onChange={onChange}
-              />
-              <Typography>{filename}</Typography>
-              <Button type="submit" color="primary" variant="contained">
-                Upload
-              </Button>
-            </Form>
-          )}
-        <Typography variant="h4">{name}</Typography>
-        <Typography variant="h6">
-          {status} at {company && <Box component="span">{company}</Box>}
-        </Typography>
-        <Typography variant="h4">
-          {location && <Box component="span">{location}</Box>}
-        </Typography>
+      <Fade cascade bottom>
+        <Paper className={classes.paper}>
+          <img
+            src={image}
+            alt={name}
+            className="img-fluid img-thumbnail"
+            style={{ width: "50%", borderRadius: "0.25em" }}
+          />
+          {auth.isAuthenticated &&
+            auth.loading === false &&
+            auth.user._id === _id && (
+              <Form onSubmit={onSubmit} className="mt-2">
+                <Form.File
+                  id="custom-file-translate-scss"
+                  label="Profile Picture"
+                  lang="en"
+                  custom
+                  onChange={onChange}
+                />
+                <Typography>{filename}</Typography>
+                <Button type="submit" color="primary" variant="contained">
+                  Upload
+                </Button>
+              </Form>
+            )}
+          <Typography variant="h4">{name}</Typography>
+          <Typography variant="h6">
+            {status} at {company && <Box component="span">{company}</Box>}
+          </Typography>
+          <Typography variant="h4">
+            {location && <Box component="span">{location}</Box>}
+          </Typography>
 
-        {website && (
-          <a
-            href={website}
-            variant="contained"
-            color="secondary"
-            rel="noopener noreferrer"
-            target="_blank"
-          >
-            <LanguageIcon />
-          </a>
-        )}
-      </Paper>
+          {website && (
+            <a
+              href={website}
+              variant="contained"
+              color="secondary"
+              rel="noopener noreferrer"
+              target="_blank"
+            >
+              <LanguageIcon />
+            </a>
+          )}
+        </Paper>
+      </Fade>
     </Fragment>
   );
 }

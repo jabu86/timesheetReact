@@ -1,15 +1,13 @@
 import {
   Card,
-  CardActions,
-  CardContent,
-  Container,
-  Grid,
   Typography,
-  Paper,
+  Avatar,
 } from "@material-ui/core";
+import { Button, Row, Col, ListGroup } from "react-bootstrap";
 import { makeStyles } from "@material-ui/core/styles";
+import Fade from 'react-reveal/Fade';
 import React, { Fragment, useEffect, useState } from "react";
-import { connect } from "react-redux";
+import { connect, useDispatch, useSelector } from "react-redux";
 import { getTimecard } from "../../actions/timecards";
 import moment from "moment";
 import MondayTime from "./weekly-time/MondayTime";
@@ -26,7 +24,6 @@ import ThursdayForm from "./weekly-form/ThursdayForm";
 import FridayForm from "./weekly-form/FridayForm";
 import SatardayForm from "./weekly-form/SatardayForm";
 import SundayForm from "./weekly-form/SundayForm";
-import { Button } from "react-bootstrap";
 import Spiner from "../Spiner";
 import TotalHoursCount from "./TotalHoursCount";
 import { Link } from "react-router-dom";
@@ -52,12 +49,14 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-function SingleTimeCard({
-  match,
-  auth: { isAuthenticated },
-  getTimecard,
-  timecard: { timecard, loading },
-}) {
+function SingleTimeCard({ match, auth: { isAuthenticated, user } }) {
+  const dispatch = useDispatch();
+  const timecardList = useSelector((state) => state.timecardDetails);
+  const { loading, error, timecard } = timecardList;
+  useEffect(() => {
+    dispatch(getTimecard(match.params.id));
+  }, [dispatch, match.params.id]);
+
   const classes = useStyles();
   const [toggleMonday, setToggleMonday] = useState(false);
   const [toggleTuesday, setToggleTuesday] = useState(false);
@@ -66,10 +65,6 @@ function SingleTimeCard({
   const [toggleFriday, setToggleFriday] = useState(false);
   const [toggleSatarday, setToggleSatarday] = useState(false);
   const [toggleSunday, setToggleSunday] = useState(false);
-
-  useEffect(() => {
-    getTimecard(match.params.id);
-  }, [getTimecard, match.params.id]);
 
   const doc = new jsPDF();
   //Print Pdf
@@ -128,118 +123,115 @@ function SingleTimeCard({
     doc.save("a4.pdf");
   };
   return (
-    <Fragment>
-      <Container className={classes.cardGrid} maxWidth="md">
-        <Grid container spacing={1}>
-          {loading ? (
-            <Spiner />
-          ) : (
-            <Fragment>
-              <Grid item xs={12}>
-                <Card className={classes.root}>
-                  <Grid container direction="row" justify="space-between">
-                    <Grid item xs={12}>
-                      <div className="row m-4">
-                        <div className="col-md-6">
-                          <div className="row">
-                            <div className="col-md-6">
-                              <Typography variant="h6">
-                                Project Name:
+    <div>
+      {loading ? (
+        <Spiner />
+      ) : error ? (
+        <h1>{error}</h1>
+      ) : (
+        <Fragment>
+          <Fade bottom cascade>
+            <Link className="btn btn-light my-3" to="/">
+              Go Back
+            </Link>
+            <Row>
+              <Col md={12}>
+                <Card>
+                  <Fade bottom cascade>
+                    {" "}
+                    <ListGroup variant="flush" className="py-2 m-2">
+                      <Row>
+                        <Col md={6}>
+                          <Avatar
+                            src={timecard.user.image}
+                            alt={timecard.user.name}
+                            className="ml-3"
+                          />
+                        </Col>
+                        <Col md={6}>{timecard.name}</Col>
+                      </Row>
+                      <Row>
+                        <Col md={6}>
+                          <Typography variant="h6" className="ml-2">
+                            Company Name:
+                          </Typography>
+                        </Col>
+                        <Col md={6}>
+                          <p>{timecard.company}</p>
+                        </Col>
+                      </Row>
+                      <Row>
+                        <Col md={6}>
+                          <Typography variant="h6" className="ml-2">
+                            Project Name:
+                          </Typography>
+                        </Col>
+                        <Col md={6}>
+                          <p>{timecard.project}</p>
+                        </Col>
+                      </Row>
+                      <Row>
+                        <Col md={6}>
+                          <Row>
+                            <Col>
+                              {" "}
+                              <Typography variant="h6" className="ml-2">
+                                Week-From:
                               </Typography>
-                            </div>
-                            <div className="col-md-6">
-                              <Typography component="p">
-                                {loading || !timecard.project
-                                  ? ""
-                                  : timecard.project}
-                              </Typography>
-                            </div>
-                            <div className="col-md-6">
-                              <Typography variant="h6">
-                                Company Name:
-                              </Typography>
-                            </div>
-                            <div className="col-md-6">
-                              <Typography component="p">
-                                {loading || !timecard.company
-                                  ? ""
-                                  : timecard.company}
-                              </Typography>
-                            </div>
-                            <div className="col-md-6">
-                              <Typography variant="h6">Week-From:</Typography>
-                            </div>
-                            <div className="col-md-6">
-                              <Typography component="p">
-                                {loading || !timecard.from
-                                  ? ""
-                                  : moment(timecard.from).format("YYYY/MM/DD")}
-                              </Typography>
-                            </div>
-                            <div className="col-md-6">
-                              <Typography variant="h6">Week-To:</Typography>
-                            </div>
-                            <div className="col-md-6">
-                              <Typography component="p">
-                                {loading || !timecard.to
-                                  ? ""
-                                  : moment(timecard.to).format("YYYY/MM/DD")}
-                              </Typography>
-                            </div>
-                            <div className="col-md-6">
-                              <Typography variant="h6">Total Hours:</Typography>
-                            </div>
-                            <div className="col-md-6">
+                            </Col>
+                            <Col>
+                              {moment(timecard.from).format("YYYY/MM/DD")}
+                            </Col>
+                          </Row>
+                        </Col>
+                        <Col md={6}>
+                          <Row>
+                            <Col>
+                              {" "}
+                              <Typography variant="h6">Week-Ending:</Typography>
+                            </Col>
+                            <Col>
+                              <p>{moment(timecard.to).format("YYYY/MM/DD")}</p>
+                            </Col>
+                          </Row>
+                        </Col>
+                      </Row>
+                      <Row>
+                        <Col md={6}>
+                          <Typography variant="h6" className="ml-2">
+                            Hours:
+                          </Typography>
+                        </Col>
+                        <Col md={6}>
+                          <p>
+                            {timecard.status === false ? (
                               <TotalHoursCount timecard={timecard} />
-                            </div>
-                          </div>
+                            ) : (
+                              timecard.total_hours
+                            )}
+                          </p>
+                        </Col>
+                      </Row>
+                      <Row>
+                        <Col md={12}>
                           <u>
-                            {" "}
-                            <Typography variant="h5">
-                              Activity Description:
+                            <Typography variant="h6" className="ml-2">
+                              Description
                             </Typography>
                           </u>
-
-                          <Typography
-                            variant="body2"
-                            color="textSecondary"
-                            component="p"
-                          >
-                            {loading || !timecard.description
-                              ? ""
-                              : timecard.description}
-                          </Typography>
-                          <Typography className="float-right" component="p">
-                            {loading || !timecard.createdAt
-                              ? ""
-                              : moment(timecard.createdAt).calendar()}
-                          </Typography>
-                        </div>
-                        <div className="col-md-6 text-center">
+                        </Col>
+                        <Col md={12} className="ml-2">
+                          <p>{timecard.description}</p>
+                        </Col>
+                      </Row>
+                      <Row>
+                        <Col md={6}></Col>
+                        <Col md={6}>
                           {" "}
-                          <img
-                            className="img img-fluid img-thumbnail"
-                            src={
-                              loading || !timecard.user.image
-                                ? ""
-                                : timecard.user.image
-                            }
-                            alt={
-                              loading || !timecard.user.name
-                                ? ""
-                                : timecard.user.name
-                            }
-                            style={{ width: "50%" }}
-                          />
-                          <h6>
-                            {loading || !timecard.user.name
-                              ? ""
-                              : timecard.user.name}
-                          </h6>
                           {isAuthenticated && timecard.status ? (
                             <Button
                               variant="primary"
-                              className="float-right"
+                              className="btn-sm"
                               onClick={(e) => printPdf(timecard)}
                             >
                               Print
@@ -247,80 +239,79 @@ function SingleTimeCard({
                           ) : (
                             ""
                           )}
-                        </div>
-                      </div>
-                    </Grid>
-                  </Grid>
-                  {isAuthenticated ? (
-                    <Grid item xs={12}>
-                      <Paper className={classes.paper}>
-                        <Button
-                          className="m-1"
-                          onClick={() => setToggleMonday(!toggleMonday)}
-                        >
-                          Monday
-                        </Button>
-                        <Button
-                          className="m-1"
-                          onClick={() => setToggleTuesday(!toggleTuesday)}
-                        >
-                          Tuesday
-                        </Button>
-                        <Button
-                          className="m-1"
-                          onClick={() => setToggleWenedsday(!toggleWenedsday)}
-                        >
-                          Wendsday
-                        </Button>
-                        <Button
-                          className="m-1"
-                          onClick={() => setToggleThursdsday(!toggleThursday)}
-                        >
-                          Thursday
-                        </Button>
-                        <Button
-                          className="m-1"
-                          onClick={() => setToggleFriday(!toggleFriday)}
-                        >
-                          Friday
-                        </Button>
-                        <Button
-                          className="m-1"
-                          onClick={() => setToggleSatarday(!toggleSatarday)}
-                        >
-                          Satarday
-                        </Button>
-                        <Button
-                          className="m-1"
-                          onClick={() => setToggleSunday(!toggleSunday)}
-                        >
-                          Sunday
-                        </Button>
-                      </Paper>
-                    </Grid>
-                  ) : (
-                    <Fragment>
-                      <Grid item xs={12}>
-                        <Paper className={classes.paper}>
-                          Click<Link to="/login">here</Link>to view
-                        </Paper>
-                      </Grid>
-                    </Fragment>
-                  )}
-
-                  {/* monday */}
-                  {toggleMonday && (
-                    <Fragment>
-                      <CardContent>
-                        {isAuthenticated ? (
-                          <Fragment>
+                          <Typography className="float-right m-2">
+                            {moment(timecard.createdAt).calendar()}
+                          </Typography>
+                        </Col>
+                      </Row>
+                    </ListGroup>
+                  </Fade>
+                </Card>
+              </Col>
+              {isAuthenticated && user._id === timecard.user._id &&(
+                <Col md={12}>
+                  <Card>
+                    <ListGroup variant="flush">
+                      <ListGroup.Item>
+                        <Row className="bg-light m-2 py-2">
+                          <Col md={12} className="text-center">
                             {" "}
-                            <u>
-                              <h3>
-                                Monday Hours{" "}
-                                {loading || !timecard.monday ? (
-                                  ""
-                                ) : (
+                            <Button
+                              className="m-1"
+                              onClick={() => setToggleMonday(!toggleMonday)}
+                            >
+                              Monday
+                            </Button>
+                            <Button
+                              className="m-1"
+                              onClick={() => setToggleTuesday(!toggleTuesday)}
+                            >
+                              Tuesday
+                            </Button>
+                            <Button
+                              className="m-1"
+                              onClick={() =>
+                                setToggleWenedsday(!toggleWenedsday)
+                              }
+                            >
+                              Wendsday
+                            </Button>
+                            <Button
+                              className="m-1"
+                              onClick={() =>
+                                setToggleThursdsday(!toggleThursday)
+                              }
+                            >
+                              Thursday
+                            </Button>
+                            <Button
+                              className="m-1"
+                              onClick={() => setToggleFriday(!toggleFriday)}
+                            >
+                              Friday
+                            </Button>
+                            <Button
+                              className="m-1"
+                              onClick={() => setToggleSatarday(!toggleSatarday)}
+                            >
+                              Satarday
+                            </Button>
+                            <Button
+                              className="m-1"
+                              onClick={() => setToggleSunday(!toggleSunday)}
+                            >
+                              Sunday
+                            </Button>
+                          </Col>
+                        </Row>
+                      </ListGroup.Item>
+                      <ListGroup.Item>
+                        <Row>
+                          {toggleMonday && (
+                            <Col className="text-center" md={12}>
+                              <u>
+                                <h3>
+                                  Monday Hours{" "}
                                   <small>
                                     <span className="badge badge-info">
                                       {timecard.monday.reduce(
@@ -329,379 +320,302 @@ function SingleTimeCard({
                                       )}
                                     </span>
                                   </small>
-                                )}{" "}
-                                & Task's {""}
-                                {loading || !timecard.monday ? (
-                                  ""
-                                ) : (
+                                  & Task's{" "}
+                                  {timecard.monday ? (
+                                    <small>
+                                      <span className="badge badge-info">
+                                        {timecard.monday.length}
+                                      </span>
+                                    </small>
+                                  ) : (
+                                    ""
+                                  )}
+                                </h3>
+                              </u>
+                              <MondayForm
+                                timecard_id={match.params.id}
+                                status={timecard.status}
+                              />
+                              {timecard.monday
+                                ? timecard.monday.map((monday) => (
+                                    <MondayTime
+                                      key={monday._id}
+                                      monday={monday}
+                                      timecard_id={match.params.id}
+                                    />
+                                  ))
+                                : ""}
+                            </Col>
+                          )}
+                        </Row>
+
+                        <Row>
+                          {toggleTuesday && (
+                            <Col className="text-center" md={12}>
+                              <u>
+                                <h3>
+                                  Tuesday Hours{" "}
                                   <small>
                                     <span className="badge badge-info">
-                                      {timecard.monday.length}
+                                      {timecard.tuesday.reduce(
+                                        (a, v) => (a = a + v.hours),
+                                        0
+                                      )}
                                     </span>
                                   </small>
-                                )}
-                              </h3>
-                            </u>
-                            <MondayForm
-                              timecard_id={match.params.id}
-                              status={timecard.status}
-                            />
-                            {/* Hours Monday span component */}
-                            {loading || !timecard.monday
-                              ? ""
-                              : timecard.monday.map((monday) => (
-                                  <MondayTime
-                                    key={monday._id}
-                                    monday={monday}
-                                    timecard_id={match.params.id}
-                                  />
-                                ))}
-                          </Fragment>
-                        ) : (
-                          ""
-                        )}
-                      </CardContent>
-                    </Fragment>
-                  )}
-                  {/* Tuesday */}
-                  {toggleTuesday && (
-                    <CardContent>
-                      {isAuthenticated ? (
-                        <Fragment>
-                          {" "}
-                          <u>
-                            <h3>
-                              Tuesday Hours{" "}
-                              {loading || !timecard.tuesday ? (
-                                ""
-                              ) : (
-                                <small>
-                                  {" "}
-                                  <span className="badge badge-info">
-                                    {timecard.tuesday.reduce(
-                                      (a, v) => (a = a + v.hours),
-                                      0
-                                    )}
-                                  </span>
-                                </small>
-                              )}{" "}
-                              & Task's {""}
-                              {loading || !timecard.tuesday ? (
-                                ""
-                              ) : (
-                                <small>
-                                  <span className="badge badge-info">
-                                    {timecard.tuesday.length}
-                                  </span>
-                                </small>
-                              )}
-                            </h3>
-                          </u>
-                          <TuesdayForm
-                            timecard_id={match.params.id}
-                            status={timecard.status}
-                          />
-                          {/* Hours tuesday span component */}
-                          {loading || !timecard.tuesday
-                            ? ""
-                            : timecard.tuesday.map((tuesday) => (
-                                <TuesdayTime
-                                  key={tuesday._id}
-                                  tuesday={tuesday}
-                                  timecard_id={match.params.id}
-                                />
-                              ))}
-                        </Fragment>
-                      ) : (
-                        ""
-                      )}
-                    </CardContent>
-                  )}
-                  {/* Wendsday */}
-                  {toggleWenedsday && (
-                    <CardContent>
-                      {isAuthenticated ? (
-                        <Fragment>
-                          {" "}
-                          <u>
-                            <h3>
-                              Wendsday Hours{" "}
-                              {loading || !timecard.wendsday ? (
-                                ""
-                              ) : (
-                                <small>
-                                  <span className="badge badge-info">
-                                    {timecard.wendsday.reduce(
-                                      (a, v) => (a = a + v.hours),
-                                      0
-                                    )}
-                                  </span>
-                                </small>
-                              )}{" "}
-                              & Task's {""}
-                              {loading || !timecard.wendsday ? (
-                                ""
-                              ) : (
-                                <small>
-                                  <span className="badge badge-info">
-                                    {timecard.wendsday.length}
-                                  </span>
-                                </small>
-                              )}
-                            </h3>
-                          </u>
-                          <WendsdayForm
-                            timecard_id={match.params.id}
-                            status={timecard.status}
-                          />
-                          {/* Hours wenedsday span component */}
-                          {loading || !timecard.wendsday
-                            ? ""
-                            : timecard.wendsday.map((wendsday) => (
-                                <WendsdayTime
-                                  key={wendsday._id}
-                                  wendsday={wendsday}
-                                  timecard_id={match.params.id}
-                                />
-                              ))}
-                        </Fragment>
-                      ) : (
-                        ""
-                      )}
-                    </CardContent>
-                  )}
-                  {/* Thursday */}
-                  {toggleThursday && (
-                    <CardContent>
-                      {isAuthenticated ? (
-                        <Fragment>
-                          {" "}
-                          <u>
-                            <h3>
-                              Thursday Hours{" "}
-                              {loading || !timecard.thursday ? (
-                                ""
-                              ) : (
-                                <small>
-                                  <span className="badge badge-info">
-                                    {timecard.thursday.reduce(
-                                      (a, v) => (a = a + v.hours),
-                                      0
-                                    )}
-                                  </span>
-                                </small>
-                              )}{" "}
-                              & Task's {""}
-                              {loading || !timecard.thursday ? (
-                                ""
-                              ) : (
-                                <small>
-                                  <span className="badge badge-info">
-                                    {timecard.thursday.length}
-                                  </span>
-                                </small>
-                              )}
-                            </h3>
-                          </u>
-                          <ThursdayForm
-                            timecard_id={match.params.id}
-                            status={timecard.status}
-                          />
-                          {/* Hours thursday span component */}
-                          {loading || !timecard.thursday
-                            ? ""
-                            : timecard.thursday.map((thursday) => (
-                                <ThursdayTime
-                                  key={thursday._id}
-                                  thursday={thursday}
-                                  timecard_id={match.params.id}
-                                />
-                              ))}
-                        </Fragment>
-                      ) : (
-                        ""
-                      )}
-                    </CardContent>
-                  )}
-                  {/* Friday */}
-                  {toggleFriday && (
-                    <CardContent>
-                      {isAuthenticated ? (
-                        <Fragment>
-                          <u>
-                            {" "}
-                            <h3>
-                              Friday Hours{" "}
-                              {loading || !timecard.friday ? (
-                                ""
-                              ) : (
-                                <small>
-                                  <span className="badge badge-info">
-                                    {timecard.friday.reduce(
-                                      (a, v) => (a = a + v.hours),
-                                      0
-                                    )}
-                                  </span>
-                                </small>
-                              )}{" "}
-                              & Task's {""}
-                              {loading || !timecard.friday ? (
-                                ""
-                              ) : (
-                                <small>
-                                  <span className="badge badge-info">
-                                    {timecard.friday.length}
-                                  </span>
-                                </small>
-                              )}
-                            </h3>
-                          </u>
-                          <FridayForm
-                            timecard_id={match.params.id}
-                            status={timecard.status}
-                          />
+                                  & Task's{" "}
+                                  {timecard.tuesday ? (
+                                    <small>
+                                      <span className="badge badge-info">
+                                        {timecard.tuesday.length}
+                                      </span>
+                                    </small>
+                                  ) : (
+                                    ""
+                                  )}
+                                </h3>
+                              </u>
+                              <TuesdayForm
+                                timecard_id={match.params.id}
+                                status={timecard.status}
+                              />
+                              {timecard.tuesday
+                                ? timecard.tuesday.map((tuesday) => (
+                                    <TuesdayTime
+                                      key={tuesday._id}
+                                      tuesday={tuesday}
+                                      timecard_id={match.params.id}
+                                    />
+                                  ))
+                                : ""}
+                            </Col>
+                          )}
+                        </Row>
 
-                          {/* Hours thursday span component */}
-                          {loading || !timecard.friday
-                            ? ""
-                            : timecard.friday.map((friday) => (
-                                <FridayTime
-                                  key={friday._id}
-                                  friday={friday}
-                                  timecard_id={match.params.id}
-                                />
-                              ))}
-                        </Fragment>
-                      ) : (
-                        ""
-                      )}
-                    </CardContent>
-                  )}
-                  {/* Satarday */}
-                  {toggleSatarday && (
-                    <CardContent>
-                      {isAuthenticated ? (
-                        <Fragment>
-                          {" "}
-                          <u>
-                            <h3>
-                              Satarday Hours{" "}
-                              {loading || !timecard.satarday ? (
-                                ""
-                              ) : (
-                                <small>
-                                  <span className="badge badge-info">
-                                    {timecard.satarday.reduce(
-                                      (a, v) => (a = a + v.hours),
-                                      0
-                                    )}
-                                  </span>
-                                </small>
-                              )}{" "}
-                              & Task's {""}
-                              {loading || !timecard.satarday ? (
-                                ""
-                              ) : (
-                                <small>
-                                  <span className="badge badge-info">
-                                    {timecard.satarday.length}
-                                  </span>
-                                </small>
-                              )}
-                            </h3>
-                          </u>
-                          <SatardayForm
-                            timecard_id={match.params.id}
-                            status={timecard.status}
-                          />
-                          {/* Hours satarday span component */}
-                          {loading || !timecard.satarday
-                            ? ""
-                            : timecard.satarday.map((satarday) => (
-                                <SatardayTime
-                                  key={satarday._id}
-                                  satarday={satarday}
-                                  timecard_id={match.params.id}
-                                />
-                              ))}
-                        </Fragment>
-                      ) : (
-                        ""
-                      )}
-                    </CardContent>
-                  )}
+                        <Row>
+                          {toggleWenedsday && (
+                            <Col className="text-center" md={12}>
+                              <u>
+                                <h3>
+                                  Wendsday Hours{" "}
+                                  <small>
+                                    <span className="badge badge-info">
+                                      {timecard.wendsday.reduce(
+                                        (a, v) => (a = a + v.hours),
+                                        0
+                                      )}
+                                    </span>{" "}
+                                  </small>
+                                  & Task's{" "}
+                                  {timecard.wendsday ? (
+                                    <small>
+                                      <span className="badge badge-info">
+                                        {timecard.wendsday.length}
+                                      </span>
+                                    </small>
+                                  ) : (
+                                    ""
+                                  )}
+                                </h3>
+                              </u>
+                              <WendsdayForm
+                                timecard_id={match.params.id}
+                                status={timecard.status}
+                              />
+                              {timecard.wendsday
+                                ? timecard.wendsday.map((wendsday) => (
+                                    <WendsdayTime
+                                      key={wendsday._id}
+                                      wendsday={wendsday}
+                                      timecard_id={match.params.id}
+                                    />
+                                  ))
+                                : ""}
+                            </Col>
+                          )}
+                        </Row>
 
-                  {/* Sunday */}
-                  {toggleSunday && (
-                    <CardContent>
-                      {isAuthenticated ? (
-                        <Fragment>
-                          <u>
-                            <h3>
-                              Sunday Hours{" "}
-                              {loading || !timecard.sunday ? (
-                                ""
-                              ) : (
-                                <small>
-                                  <span className="badge badge-info">
-                                    {timecard.sunday.reduce(
-                                      (a, v) => (a = a + v.hours),
-                                      0
-                                    )}
-                                  </span>
-                                </small>
-                              )}{" "}
-                              & Task's {""}
-                              {loading || !timecard.sunday ? (
-                                ""
-                              ) : (
-                                <small>
-                                  <span className="badge badge-info">
-                                    {timecard.sunday.length}
-                                  </span>
-                                </small>
-                              )}
-                            </h3>
-                          </u>
-                          <SundayForm
-                            timecard_id={match.params.id}
-                            status={timecard.status}
-                          />
+                        <Row>
+                          {toggleThursday && (
+                            <Col className="text-center" md={12}>
+                              <u>
+                                <h3>
+                                  Thursday Hours{" "}
+                                  <small>
+                                    <span className="badge badge-info">
+                                      {timecard.thursday.reduce(
+                                        (a, v) => (a = a + v.hours),
+                                        0
+                                      )}
+                                    </span>{" "}
+                                  </small>
+                                  & Task's{" "}
+                                  {timecard.thursday ? (
+                                    <small>
+                                      <span className="badge badge-info">
+                                        {timecard.thursday.length}
+                                      </span>
+                                    </small>
+                                  ) : (
+                                    ""
+                                  )}
+                                </h3>
+                              </u>
+                              <ThursdayForm
+                                timecard_id={match.params.id}
+                                status={timecard.status}
+                              />
+                              {timecard.thursday
+                                ? timecard.thursday.map((thursday) => (
+                                    <ThursdayTime
+                                      key={thursday._id}
+                                      thursday={thursday}
+                                      timecard_id={match.params.id}
+                                    />
+                                  ))
+                                : ""}
+                            </Col>
+                          )}
+                        </Row>
 
-                          {/* Hours satarday span component */}
-                          {loading || !timecard.sunday
-                            ? ""
-                            : timecard.sunday.map((sunday) => (
-                                <SundayTime
-                                  key={sunday._id}
-                                  sunday={sunday}
-                                  timecard_id={match.params.id}
-                                />
-                              ))}
-                        </Fragment>
-                      ) : (
-                        ""
-                      )}
-                    </CardContent>
-                  )}
+                        <Row>
+                          {toggleFriday && (
+                            <Col className="text-center" md={12}>
+                              <u>
+                                <h3>
+                                  Friday Hours{" "}
+                                  <small>
+                                    <span className="badge badge-info">
+                                      {timecard.friday.reduce(
+                                        (a, v) => (a = a + v.hours),
+                                        0
+                                      )}
+                                    </span>{" "}
+                                  </small>
+                                  & Task's{" "}
+                                  {timecard.friday ? (
+                                    <small>
+                                      <span className="badge badge-info">
+                                        {timecard.friday.length}
+                                      </span>
+                                    </small>
+                                  ) : (
+                                    ""
+                                  )}
+                                </h3>
+                              </u>
+                              <FridayForm
+                                timecard_id={match.params.id}
+                                status={timecard.status}
+                              />
+                              {timecard.friday
+                                ? timecard.friday.map((friday) => (
+                                    <FridayTime
+                                      key={friday._id}
+                                      friday={friday}
+                                      timecard_id={match.params.id}
+                                    />
+                                  ))
+                                : ""}
+                            </Col>
+                          )}
+                        </Row>
 
-                  <CardActions style={{ float: "right" }}>
-                    <Button
-                      href="/timecard"
-                      size="small"
-                      color="secondary"
-                      variant="danger"
-                    >
-                      Back
-                    </Button>
-                  </CardActions>
-                </Card>
-              </Grid>
-            </Fragment>
-          )}
-        </Grid>
-      </Container>
-    </Fragment>
+                        <Row>
+                          {toggleSatarday && (
+                            <Col className="text-center" md={12}>
+                              <u>
+                                <h3>
+                                  Satarday Hours{" "}
+                                  <small>
+                                    <span className="badge badge-info">
+                                      {timecard.satarday.reduce(
+                                        (a, v) => (a = a + v.hours),
+                                        0
+                                      )}
+                                    </span>{" "}
+                                  </small>
+                                  & Task's{" "}
+                                  {timecard.satarday ? (
+                                    <small>
+                                      <span className="badge badge-info">
+                                        {timecard.satarday.length}
+                                      </span>
+                                    </small>
+                                  ) : (
+                                    ""
+                                  )}
+                                </h3>
+                              </u>
+                              <SatardayForm
+                                timecard_id={match.params.id}
+                                status={timecard.status}
+                              />
+                              {timecard.satarday
+                                ? timecard.satarday.map((satarday) => (
+                                    <SatardayTime
+                                      key={satarday._id}
+                                      satarday={satarday}
+                                      timecard_id={match.params.id}
+                                    />
+                                  ))
+                                : ""}
+                            </Col>
+                          )}
+                        </Row>
+
+                        <Row>
+                          {toggleSunday && (
+                            <Col className="text-center" md={12}>
+                              <u>
+                                <h3>
+                                  Sunday Hours{" "}
+                                  <small>
+                                    <span className="badge badge-info">
+                                      {timecard.sunday.reduce(
+                                        (a, v) => (a = a + v.hours),
+                                        0
+                                      )}
+                                    </span>{" "}
+                                  </small>
+                                  & Task's{" "}
+                                  {timecard.sunday ? (
+                                    <small>
+                                      <span className="badge badge-info">
+                                        {timecard.sunday.length}
+                                      </span>
+                                    </small>
+                                  ) : (
+                                    ""
+                                  )}
+                                </h3>
+                              </u>
+                              <SundayForm
+                                timecard_id={match.params.id}
+                                status={timecard.status}
+                              />
+                              {timecard.sunday
+                                ? timecard.sunday.map((sunday) => (
+                                    <SundayTime
+                                      key={sunday._id}
+                                      sunday={sunday}
+                                      timecard_id={match.params.id}
+                                    />
+                                  ))
+                                : ""}
+                            </Col>
+                          )}
+                        </Row>
+                      </ListGroup.Item>
+                    </ListGroup>
+                  </Card>
+                </Col>
+              )}
+            </Row>
+          </Fade>
+        </Fragment>
+      )}
+    </div>
   );
 }
 const mapStateToProps = (state) => ({

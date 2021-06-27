@@ -2,15 +2,16 @@ import React, { Fragment, useState, useEffect } from "react";
 import Grid from "@material-ui/core/Grid";
 import Container from "@material-ui/core/Container";
 import { makeStyles } from "@material-ui/core/styles";
-import { connect } from "react-redux";
-import { getTimecards, deleteTimecard } from "../../actions/timecards";
+import { useSelector, useDispatch } from "react-redux";
+import { getTimecards } from "../../actions/timecards";
 import Spiner from "../Spiner";
 import AddTimeCard from "./AddTimeCard";
 import AllTimeCards from "./AllTimeCards";
 import Filter from "./TimeUserCardCount";
 import TablePagination from "@material-ui/core/TablePagination";
+import AlertMsg from "../AlertMsg";
 import { Paper } from "@material-ui/core";
-
+import { Link } from "react-router-dom";
 
 const useStyles = makeStyles((theme) => ({
   cardGrid: {
@@ -27,65 +28,56 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-function TimeCard({ getTimecards, timecard: { loading, filteredTimecards } }) {
+function TimeCard() {
   const classes = useStyles();
-   //new pagination
-  const [page, setPage] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(6);
+  const dispatch = useDispatch();
+  const timecard = useSelector((state) => state.timecardList);
+  const auth = useSelector((state) => state.auth);
+  const { timecards, filteredTimecards, loading, error } = timecard;
+  const { isAuthenticated, user } = auth;
+  console.log();
 
-  const handleChangePage = (event, newPage) => {
-    setPage(newPage);
-  };
-  const handleChangeRowsPerPage = (event) => {
-    setRowsPerPage(+event.target.value);
-    setPage(0);
-  };
   useEffect(() => {
-    getTimecards();
-  }, [getTimecards]);
+    dispatch(getTimecards());
+  }, [dispatch]);
+
   return (
     <Fragment>
       <Container className={classes.cardGrid} maxWidth="md">
         <Grid container spacing={1}>
           {loading ? (
             <Spiner />
+          ) : error ? (
+            <AlertMsg />
           ) : (
-            <Fragment>
+            <>
               <Grid item xs={12}>
-                <AddTimeCard />
+                {isAuthenticated ? (
+                  <AddTimeCard />
+                ) : (
+                  <h4>
+                    <Link to="/login">
+                      <small>
+                        <strong>SignIn</strong>
+                      </small>
+                    </Link>{" "}
+                    to create a timecard
+                  </h4>
+                )}
                 <br />
                 <Filter />
               </Grid>
-              {filteredTimecards &&
-                filteredTimecards !== null &&
-                filteredTimecards
-                  .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                  .map((timecard) => (
-                    <AllTimeCards timecard={timecard} key={timecard._id} />
-                  ))}
-            </Fragment>
-          )}
-        </Grid>
-        <Grid item>
-          <Paper>
-            <TablePagination
-              rowsPerPageOptions={[6, 12, 18]}
 
-              count={filteredTimecards.length}
-              rowsPerPage={rowsPerPage}
-              page={page}
-              onChangePage={handleChangePage}
-              onChangeRowsPerPage={handleChangeRowsPerPage}
-            />
-          </Paper>
+              {filteredTimecards &&
+                filteredTimecards.map((timecard) => (
+                  <AllTimeCards timecard={timecard} key={timecard._id} />
+                ))}
+            </>
+          )}
         </Grid>
       </Container>
     </Fragment>
   );
 }
-const mapStateToProps = (state) => ({
-  timecard: state.timecard,
-});
-export default connect(mapStateToProps, { getTimecards, deleteTimecard })(
-  TimeCard
-);
+
+export default TimeCard;

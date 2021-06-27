@@ -153,7 +153,6 @@ export const logout = () => (dispatch) => {
 };
 
 //Image Upload
-
 export const imageUpload = (file, _id) => async (dispatch) => {
   const formData = new FormData();
   formData.append("file", file);

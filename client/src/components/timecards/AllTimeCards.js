@@ -18,7 +18,7 @@ import TimeToLeave from "@material-ui/icons/Timelapse";
 import ViewWeekIcon from "@material-ui/icons/ViewWeek";
 import { Button, IconButton } from "@material-ui/core";
 import TextTruncate from "react-text-truncate";
-import TotalHoursCount from "./TotalHoursCount";
+import Fade from "react-reveal/Flip";
 const useStyles = makeStyles((theme) => ({
   cardGrid: {
     paddingTop: theme.spacing(8),
@@ -77,122 +77,126 @@ function AllTimeCards({
   return (
     <Fragment>
       <Grid item xs={12} sm={6} md={4}>
-        <Card className={classes.card}>
-          <Grid container spacing={0}>
-            <Grid item xs={12} sm={4}>
-              <Link to={"/profile/" + timecard.user._id}>
-                {" "}
-                <Avatar
-                  src={timecard.user.image}
-                  alt={timecard.user.name}
-                  title={timecard.user.name}
-                  className={classes.cardMedia}
-                />
-              </Link>
-              <Typography>{timecard.user.name}</Typography>
-            </Grid>
-            <Grid item xs={12} sm={8}>
-              <Chip
-                className="chip-font"
-                variant="outlined"
-                size="small"
-                color="primary"
-                label={"Project: " + timecard.project}
-              />
-              <Divider />
-              <Chip
-                className="chip-font"
-                variant="outlined"
-                size="small"
-                color="primary"
-                label={"Company: " + timecard.company}
-              />
-              <Divider />
-              <Chip
-                className="chip-font"
-                variant="outlined"
-                size="small"
-                color="primary"
-                label={
-                  "Week from: " + moment(timecard.from).format("YYYY-MM-DD")
-                }
-              />
-              <Divider />
-              <Chip
-                className="chip-font mb-4"
-                variant="outlined"
-                size="small"
-                color="primary"
-                label={
-                  "Week ending: " + moment(timecard.to).format("YYYY-MM-DD")
-                }
-              />
-            </Grid>
-          </Grid>
-
-          <CardContent className={classes.cardContent}>
-            <Typography variant="h6">
-              <TextTruncate
-                line={1}
-                element="span"
-                truncateText="…"
-                text={timecard.description}
-                textTruncateChild={
-                  <Button
+        <Fade bottom cascade>
+          <Card className={classes.card} style={{height:'50vh'}}>
+            <Fade bottom cascade>
+              {" "}
+              <Grid container spacing={0}>
+                <Grid item xs={12} sm={4}>
+                  <Link to={"/profile/" + timecard.user._id}>
+                    {" "}
+                    <Avatar
+                      src={timecard.user.image}
+                      alt={timecard.user.name}
+                      title={timecard.user.name}
+                      className={classes.cardMedia}
+                    />
+                  </Link>
+                  <Typography>{timecard.user.name}</Typography>
+                </Grid>
+                <Grid item xs={12} sm={8}>
+                  <Chip
+                    className="chip-font"
+                    variant="outlined"
                     size="small"
                     color="primary"
-                    href={"/timecard/" + timecard._id}
+                    label={"Project: " + timecard.project}
+                  />
+                  <Divider />
+                  <Chip
+                    className="chip-font"
+                    variant="outlined"
+                    size="small"
+                    color="primary"
+                    label={"Company: " + timecard.company}
+                  />
+                  <Divider />
+                  <Chip
+                    className="chip-font"
+                    variant="outlined"
+                    size="small"
+                    color="primary"
+                    label={
+                      "Week from: " + moment(timecard.from).format("YYYY-MM-DD")
+                    }
+                  />
+                  <Divider />
+                  <Chip
+                    className="chip-font mb-4"
+                    variant="outlined"
+                    size="small"
+                    color="primary"
+                    label={
+                      "Week ending: " + moment(timecard.to).format("YYYY-MM-DD")
+                    }
+                  />
+                </Grid>
+              </Grid>
+              <CardContent className={classes.cardContent}>
+                <Typography component="p">
+                  <TextTruncate
+                    line={1}
+                    element="span"
+                    truncateText="…"
+                    text={timecard.description}
+                    textTruncateChild={
+                      <Button
+                        size="small"
+                        color="primary"
+                        href={"/timecard/" + timecard._id}
+                      >
+                        Learn More
+                      </Button>
+                    }
+                  />
+                </Typography>
+                <Typography style={{ float: "right" }}>
+                  <small>
+                    <em>{moment(timecard.createdAt).calendar()}</em>
+                  </small>
+                </Typography>
+              </CardContent>
+              <CardContent>
+                <Typography variant="h6" style={{ float: "right" }}>
+                  Hours: {total}
+                </Typography>
+              </CardContent>
+              <CardActions>
+                <Link
+                  to={`/timecard/${timecard._id}`}
+                  size="small"
+                  color="primary"
+                >
+                  <ViewWeekIcon />
+                </Link>
+                {isAuthenticated && user._id === timecard.user._id ? (
+                  <EditTimeCard timecard={timecard} />
+                ) : (
+                  ""
+                )}
+                {isAuthenticated && user._id === timecard.user._id ? (
+                  <IconButton onClick={() => deleteTimecard(timecard._id)}>
+                    <HighlightOffIcon size="small" color="secondary" />
+                  </IconButton>
+                ) : (
+                  ""
+                )}
+                {timecard.status === false &&
+                isAuthenticated &&
+                user.role === "manager" ? (
+                  <IconButton
+                    size="small"
+                    onClick={(e) => approve(status, timecard._id, total)}
                   >
-                    Learn More
-                  </Button>
-                }
-              />
-            </Typography>
-            <Typography style={{ float: "right" }}>
-              <small>
-                <em>{moment(timecard.createdAt).calendar()}</em>
-              </small>
-            </Typography>
-          </CardContent>
-          <CardContent>
-            <Typography variant="h6" style={{ float: "right" }}>
-              Total Hours: {total}
-            </Typography>
-          </CardContent>
-          <CardActions>
-            <IconButton
-              href={`/timecard/${timecard._id}`}
-              size="small"
-              color="primary"
-            >
-              <ViewWeekIcon />
-            </IconButton>
-            {isAuthenticated && user._id === timecard.user._id ? (
-              <EditTimeCard timecard={timecard} />
-            ) : (
-              ""
-            )}
-            {isAuthenticated && user._id === timecard.user._id ? (
-              <IconButton onClick={() => deleteTimecard(timecard._id)}>
-                <HighlightOffIcon size="small" color="secondary" />
-              </IconButton>
-            ) : (
-              ""
-            )}
-            {timecard.status === false &&
-            isAuthenticated &&
-            user.role === "manager" ? (
-              <IconButton
-                size="small"
-                onClick={(e) => approve(status, timecard._id, total)}
-              >
-                <TimeToLeave size="small" color="primary" />
-              </IconButton>
-            ) : (
-              ""
-            )}
-          </CardActions>
-        </Card>
+                    <TimeToLeave size="small" color="primary" />
+                  </IconButton>
+                ) : (
+                  ""
+                )}
+              </CardActions>
+            </Fade>
+          </Card>
+        </Fade>
       </Grid>
     </Fragment>
   );

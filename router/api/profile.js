@@ -82,15 +82,8 @@ router.post(
     if (!errors.isEmpty()) {
       return res.status(400).json({ errors: errors.array() });
     }
-    const {
-      company,
-      title,
-      from,
-      description,
-      current,
-      to,
-      location,
-    } = req.body;
+    const { company, title, from, description, current, to, location } =
+      req.body;
 
     try {
       const profile = await Profile.findOne({ user: req.user.id });
@@ -139,15 +132,8 @@ router.post(
     if (!errors.isEmpty()) {
       return res.status(400).json({ errors: errors.array() });
     }
-    const {
-      school,
-      degree,
-      fieldofstudy,
-      from,
-      to,
-      description,
-      current,
-    } = req.body;
+    const { school, degree, fieldofstudy, from, to, description, current } =
+      req.body;
 
     const newEdu = {
       school,
@@ -242,18 +228,20 @@ router.post("/upload", auth, async (req, res) => {
       }
       // The name of the input field (i.e. "sampleFile") is used to retrieve the uploaded file
       const file = req.files.file;
-      file.mv(`${__dirname}/client/public/images/${file.name}`, async (err) => {
+      const fileName = file.name.replace(/ /g, "_");
+      file.mv(`${__dirname}/client/public/images/${fileName}`, async (err) => {
         if (err) {
           console.log(err);
           return res.status(500).send(err);
         }
+        console.log(fileName);
         //Update profile image
-        user.image = "/images/" + file.name;
+        user.image = "/images/" + fileName;
         await user.save();
         res.status(200).json({
           msg: "File upload success",
-          fileName: file.name,
-          filePath: `/images/${file.name}`,
+          fileName: fileName,
+          filePath: `/images/${fileName}`,
           user,
         });
       });

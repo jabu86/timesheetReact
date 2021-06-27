@@ -1,17 +1,15 @@
 import React from "react";
 import { Form } from "react-bootstrap";
 import { Grid } from "@material-ui/core";
-import { connect } from "react-redux";
+import {Fade} from 'react-reveal';
+import { useDispatch } from "react-redux";
 import { searchTimecard, orderTimecard } from "../../actions/timecards";
 
-function TimeUserCardCount({
-  searchTimecard,
-  orderTimecard,
-  timecard: { timecards },
-}) {
+function TimeUserCardCount() {
+const dispatch = useDispatch();
   return (
     <>
-      <Grid container justify="center" className="counter-grid">
+      <Fade left cascade>
         <Grid item sm={12}>
           {" "}
           <div className="row">
@@ -22,7 +20,7 @@ function TimeUserCardCount({
                   type="text"
                   placeholder="Search...."
                   name="search"
-                  onChange={(e) => searchTimecard(timecards, e.target.value)}
+                  onChange={(e) => dispatch(searchTimecard(e.target.value))}
                 />
               </Form.Row>
             </div>
@@ -32,7 +30,7 @@ function TimeUserCardCount({
                   <Form.Control
                     as="select"
                     size="lg"
-                    onChange={(e) => orderTimecard(timecards, e.target.value)}
+                    onChange={(e) => dispatch(orderTimecard(e.target.value))}
                     custom
                   >
                     <option value="latest">Latest</option>
@@ -43,15 +41,9 @@ function TimeUserCardCount({
             </div>
           </div>
         </Grid>
-      </Grid>
+      </Fade>
     </>
   );
 }
-const mapStateToProps = (state) => ({
-  timecard: state.timecard,
-  text: state.timecard.text,
-  sort: state.timecard.sort,
-});
-export default connect(mapStateToProps, { searchTimecard, orderTimecard })(
-  TimeUserCardCount
-);
+
+export default  TimeUserCardCount;

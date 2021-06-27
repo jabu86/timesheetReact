@@ -95,6 +95,10 @@ router.put(
     check("from", "The date week when you started is required").not().isEmpty(),
     check("to", "The date week when you ended is required").not().isEmpty(),
     check("description", "Description is required").not().isEmpty(),
+    check(
+      "description",
+      "Describe what you worked on a task is required"
+    ).isLength({ max: 1000 }),
   ],
   async (req, res) => {
     const errors = validationResult(req);
@@ -140,6 +144,10 @@ router.post(
     check("from", "The date week when you started is required").not().isEmpty(),
     check("to", "The date week when you ended is required").not().isEmpty(),
     check("description", "Description is required").not().isEmpty(),
+    check(
+      "description",
+      "Description must not be more than 1000 characters"
+    ).isLength({max:1000}),
   ],
   async (req, res) => {
     const errors = validationResult(req);
