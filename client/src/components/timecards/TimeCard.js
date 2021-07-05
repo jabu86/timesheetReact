@@ -1,4 +1,4 @@
-import React, { Fragment, useState, useEffect } from "react";
+import React, { Fragment, useEffect } from "react";
 import Grid from "@material-ui/core/Grid";
 import Container from "@material-ui/core/Container";
 import { makeStyles } from "@material-ui/core/styles";
@@ -8,10 +8,9 @@ import Spiner from "../Spiner";
 import AddTimeCard from "./AddTimeCard";
 import AllTimeCards from "./AllTimeCards";
 import Filter from "./TimeUserCardCount";
-import TablePagination from "@material-ui/core/TablePagination";
 import AlertMsg from "../AlertMsg";
-import { Paper } from "@material-ui/core";
 import { Link } from "react-router-dom";
+import Paginationate from "./Paginationate";
 
 const useStyles = makeStyles((theme) => ({
   cardGrid: {
@@ -28,22 +27,22 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-function TimeCard() {
+function TimeCard({ match }) {
   const classes = useStyles();
+  const pageNumber = match.params.pageNumber || 1;
   const dispatch = useDispatch();
   const timecard = useSelector((state) => state.timecardList);
   const auth = useSelector((state) => state.auth);
-  const { timecards, filteredTimecards, loading, error } = timecard;
+  const { filteredTimecards, loading, error, page, pages } = timecard;
   const { isAuthenticated, user } = auth;
-  console.log();
 
   useEffect(() => {
-    dispatch(getTimecards());
-  }, [dispatch]);
+    dispatch(getTimecards(pageNumber));
+  }, [dispatch, pageNumber]);
 
   return (
     <Fragment>
-      <Container className={classes.cardGrid} maxWidth="md">
+      <Container className={classes.cardGrid} >
         <Grid container spacing={1}>
           {loading ? (
             <Spiner />
@@ -52,7 +51,7 @@ function TimeCard() {
           ) : (
             <>
               <Grid item xs={12}>
-                {isAuthenticated ? (
+                {isAuthenticated && user ? (
                   <AddTimeCard />
                 ) : (
                   <h4>
@@ -75,6 +74,8 @@ function TimeCard() {
             </>
           )}
         </Grid>
+        <br />
+        <Paginationate pages={pages} page={page} userTimecards={""} />
       </Container>
     </Fragment>
   );

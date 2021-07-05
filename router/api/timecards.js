@@ -10,15 +10,49 @@ const router = express.Router();
 //@route    GET     /api/timecards
 //@desc     Get all timecards
 //@access   Public
-router.get("/", async (req, res) => {
+router.get("/", auth, async (req, res) => {
   try {
-    const timecards = await TimeCard.find()
+    const pageSize = 9;
+    const page = Number(req.query.pageNumber) || 1;
+    const keyword = req.query.keyword
+      ? {
+          $or: [
+            { company: { $regex: req.query.keyword, $options: "i" } },
+            { project: { $regex: req.query.keyword, $options: "i" } },
+            { name: { $regex: req.query.keyword, $options: "i" } },
+            { description: { $regex: req.query.keyword, $options: "i" } },
+          ],
+        }
+      : {};
+    const count = await TimeCard.countDocuments({ ...keyword });
+    const timecards = await TimeCard.find({ ...keyword })
       .sort({ createdAt: -1 })
-      .populate("user", ["name", "image"]);
+      .populate("user", ["name", "image"])
+      .limit(pageSize)
+      .skip(pageSize * (page - 1));
     if (!timecards) {
       res.status(404).json({ msg: "There are no timecards" });
     }
-    res.json(timecards);
+    res.json({ timecards, page, pages: Math.ceil(count / pageSize) });
+  } catch (error) {
+    console.log(error.message);
+    res.status(500).send("Server error");
+  }
+});
+
+//@route    GET     /api/timecards/latest
+//@desc     Get     3 Latest timecards
+//@access   Public
+router.get("/latest", async (req, res) => {
+  try {
+    const timecards = await TimeCard.find()
+      .sort({ createdAt: -1 })
+      .populate("user", ["name", "image"])
+      .limit(3);
+    if (!timecards) {
+      res.status(404).json({ msg: "There are no timecards" });
+    }
+    res.json({ timecards });
   } catch (error) {
     console.log(error.message);
     res.status(500).send("Server error");
@@ -26,19 +60,36 @@ router.get("/", async (req, res) => {
 });
 
 //@route    GET     /api/timecards/user/:user_id
-//@desc     Get all timecards for a user
+//@desc     Get     all timecards for a user
 //@access   Private
 router.get("/user/:user_id", auth, async (req, res) => {
   try {
+     const pageSize = 9;
+     const page = Number(req.query.pageNumber) || 1;
+     const keyword = req.query.keyword
+       ? {
+           $or: [
+             { company: { $regex: req.query.keyword, $options: "i" } },
+             { project: { $regex: req.query.keyword, $options: "i" } },
+             { name: { $regex: req.query.keyword, $options: "i" } },
+             { description: { $regex: req.query.keyword, $options: "i" } },
+           ],
+         }
+       : {};
+    const count = await TimeCard.find({
+      user: req.params.user_id,
+    }).countDocuments({...keyword});
     const timecards = await TimeCard.find({
       user: req.params.user_id,
     })
       .sort({ createdAt: -1 })
-      .populate("user", ["name", "image"]);
+      .populate("user", ["name", "image"])
+      .limit(pageSize)
+      .skip(pageSize * (page - 1));
     if (!timecards) {
       res.status(404).json({ msg: "There are no timecards" });
     }
-    res.status(200).json(timecards);
+    res.json({ timecards, page, pages: Math.ceil(count / pageSize) });
   } catch (error) {
     console.log(error.message);
     res.status(500).send("Server error");
@@ -147,7 +198,7 @@ router.post(
     check(
       "description",
       "Description must not be more than 1000 characters"
-    ).isLength({max:1000}),
+    ).isLength({ max: 1000 }),
   ],
   async (req, res) => {
     const errors = validationResult(req);

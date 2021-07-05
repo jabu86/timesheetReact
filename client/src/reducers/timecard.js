@@ -38,8 +38,10 @@ export const timecardReducer = (
     case GET_TIMECARDS:
       return {
         loading: false,
-        timecards: action.payload,
-        filteredTimecards: action.payload,
+        timecards: action.payload.timecards,
+        filteredTimecards: action.payload.timecards,
+        page: action.payload.page,
+        pages: action.payload.pages,
       };
     case GET_TIMECARD:
       return {

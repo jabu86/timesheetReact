@@ -48,9 +48,20 @@ function App() {
                 <Route exact path="/register" component={Register} />
                 <Route exact path="/profiles" component={Profiles} />
                 <Route exact path="/profile/:id" component={Profile} />
-                <PrivateRoute exact path="/timecard" component={TimeCard} />
                 <Route exact path="/timecard/:id" component={SingleTimeCard} />
+                <PrivateRoute exact path="/timecard" component={TimeCard} />
+                <PrivateRoute
+                  exact
+                  path="/timecard/page/:pageNumber"
+                  component={TimeCard}
+                />
                 <PrivateRoute exact path="/my_time" component={UserTimeCards} />
+                <PrivateRoute
+                  path="/my_time/page/:pageNumber"
+                  component={UserTimeCards}
+                  exact
+                />
+
                 <PrivateRoute exact path="/dashboard" component={Dashboard} />
                 <PrivateRoute
                   exact

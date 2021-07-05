@@ -31,10 +31,32 @@ import {
 } from "./types";
 
 //Get timecards
-export const getTimecards = () => async (dispatch) => {
+export const getTimecards =
+  (pageNumber = "") =>
+  async (dispatch) => {
+    dispatch({ type: GET_TIMECARDS_REQUEST });
+    try {
+      const res = await axios.get(`/api/timecards?pageNumber=${pageNumber}`);
+      dispatch({
+        type: GET_TIMECARDS,
+        payload: res.data,
+      });
+    } catch (err) {
+      dispatch({
+        type: TIMECARDS_ERROR,
+        payload:
+          err.response && err.response.data.msg
+            ? err.response.data.msg
+            : err.response.data,
+      });
+    }
+  };
+
+//Get latest timecards
+export const getLatestTimecards = () => async (dispatch) => {
   dispatch({ type: GET_TIMECARDS_REQUEST });
   try {
-    const res = await axios.get("/api/timecards");
+    const res = await axios.get(`/api/timecards/latest`);
     dispatch({
       type: GET_TIMECARDS,
       payload: res.data,
@@ -51,24 +73,28 @@ export const getTimecards = () => async (dispatch) => {
 };
 
 //Get user timecards
-export const getUserTimecards = (user_id) => async (dispatch) => {
-  dispatch({ type: GET_TIMECARDS_REQUEST });
-  try {
-    const res = await axios.get(`/api/timecards/user/${user_id}`);
-    dispatch({
-      type: GET_TIMECARDS,
-      payload: res.data,
-    });
-  } catch (err) {
-    dispatch({
-      type: TIMECARDS_ERROR,
-      payload:
-        err.response && err.response.data.msg
-          ? err.response.data.msg
-          : err.response.data,
-    });
-  }
-};
+export const getUserTimecards =
+  (user_id, keyword = "", pageNumber = "") =>
+  async (dispatch) => {
+    dispatch({ type: GET_TIMECARDS_REQUEST });
+    try {
+      const res = await axios.get(
+        `/api/timecards/user/${user_id}?keyword=${keyword}&pageNumber=${pageNumber}`
+      );
+      dispatch({
+        type: GET_TIMECARDS,
+        payload: res.data,
+      });
+    } catch (err) {
+      dispatch({
+        type: TIMECARDS_ERROR,
+        payload:
+          err.response && err.response.data.msg
+            ? err.response.data.msg
+            : err.response.data,
+      });
+    }
+  };
 
 //Get SINGLE timecard
 export const getTimecard = (id) => async (dispatch) => {
@@ -91,19 +117,40 @@ export const getTimecard = (id) => async (dispatch) => {
   }
 };
 //Search Timecard
-export const searchTimecard = (text) => async (dispatch, getState) => {
-  const timecards = getState().timecardList.timecards;
-  let filterValues = timecards.filter((timecard) => {
-    return (
-      timecard.company.toLowerCase().includes(text.toLowerCase()) ||
-      timecard.project.toLowerCase().includes(text.toLowerCase()) ||
-      timecard.description.toLowerCase().includes(text.toLowerCase()) ||
-      timecard.name.toLowerCase().includes(text.toLowerCase()) ||
-      timecard.user.name.toLowerCase().includes(text.toLowerCase())
-    );
-  });
-  dispatch({ type: SEARCH_TIMECARD, payload: filterValues });
-};
+export const searchTimecard =
+  (text, pageNumber = "") =>
+  async (dispatch, getState) => {
+    dispatch({ type: GET_TIMECARDS_REQUEST });
+    try {
+      const res = await axios.get(
+        `/api/timecards?keyword=${text}&pageNumber=${pageNumber}`
+      );
+      dispatch({
+        type: GET_TIMECARDS,
+        payload: res.data,
+      });
+    } catch (err) {
+      dispatch({
+        type: TIMECARDS_ERROR,
+        payload:
+          err.response && err.response.data.msg
+            ? err.response.data.msg
+            : err.response.data,
+      });
+    }
+
+    //  const timecards = getState().timecardList.timecards;
+    //  let filterValues = timecards.filter((timecard) => {
+    //    return (
+    //      timecard.company.toLowerCase().includes(text.toLowerCase()) ||
+    //      timecard.project.toLowerCase().includes(text.toLowerCase()) ||
+    //      timecard.description.toLowerCase().includes(text.toLowerCase()) ||
+    //      timecard.name.toLowerCase().includes(text.toLowerCase()) ||
+    //      timecard.user.name.toLowerCase().includes(text.toLowerCase())
+    //    );
+    //  });
+    //  dispatch({ type: SEARCH_TIMECARD, payload: filterValues });
+  };
 
 export const orderTimecard = (sort) => async (dispatch, getState) => {
   const timecards = getState().timecardList.timecards;
@@ -251,7 +298,6 @@ export const addTimecardMonday = (id, formData) => async (dispatch) => {
     if (err.response.data.msg) {
       dispatch(setAlert(err.response.data.msg, "error", 5000));
     }
-   
   }
 };
 

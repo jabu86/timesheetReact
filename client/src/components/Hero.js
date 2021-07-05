@@ -1,16 +1,16 @@
 import React from "react";
-import Typography from '@material-ui/core/Typography';
-import { makeStyles } from '@material-ui/core/styles';
-import Container from '@material-ui/core/Container';
+import Typography from "@material-ui/core/Typography";
+import { makeStyles } from "@material-ui/core/styles";
+import Container from "@material-ui/core/Container";
 const useStyles = makeStyles((theme) => ({
   heroContent: {
     backgroundColor: theme.palette.background.paper,
-    padding: theme.spacing(8, 0, 6),
+    padding: theme.spacing(10, 0, 6),
+    height: "60vh",
   },
   heroButtons: {
     marginTop: theme.spacing(4),
   },
-
 }));
 
 function Hero() {
@@ -24,6 +24,7 @@ function Hero() {
           align="center"
           color="textPrimary"
           gutterBottom
+
         >
           Weekly TimeSheet
         </Typography>
@@ -31,7 +32,6 @@ function Hero() {
           Keep track of you'r tasks, take control of you'r work, create you'r
           weekly timecard.
         </Typography>
-
       </Container>
     </div>
   );
