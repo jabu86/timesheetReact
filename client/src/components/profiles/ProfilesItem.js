@@ -1,5 +1,5 @@
 import React, { Fragment } from "react";
-import { Avatar, Button, Typography } from "@material-ui/core";
+import { Avatar, Typography } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
 import Fade from "react-reveal/Fade";
 import List from "@material-ui/core/List";

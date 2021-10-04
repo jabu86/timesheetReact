@@ -25,11 +25,7 @@ function SundayForm({ timecard_id, addTimecardSunday, status }) {
       <Col md={3}></Col>
       <Col md={6}>
         <Fade>
-          <Form
-            className="mb-2"
-            onSubmit={(e) => onSubmit(e)}
-            className="text-left"
-          >
+          <Form className="mb-2 text-left" onSubmit={(e) => onSubmit(e)}>
             <Form.Group controlId="hours">
               <Form.Label>Time in hours to span on a task</Form.Label>
               <Form.Control

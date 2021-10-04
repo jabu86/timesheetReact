@@ -37,7 +37,7 @@ function Home({ isAuthenticated }) {
       return <Redirect to="/timecard" />;
     }
     dispatch(getLatestTimecards());
-  }, [dispatch]);
+  }, [dispatch, isAuthenticated]);
   if (isAuthenticated) {
     return <Redirect to="/timecard" />;
   }

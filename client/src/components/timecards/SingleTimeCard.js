@@ -4,7 +4,7 @@ import {
   Avatar,
 } from "@material-ui/core";
 import { Button, Row, Col, ListGroup } from "react-bootstrap";
-import { makeStyles } from "@material-ui/core/styles";
+
 import Fade from 'react-reveal/Fade';
 import React, { Fragment, useEffect, useState } from "react";
 import { connect, useDispatch, useSelector } from "react-redux";
@@ -29,25 +29,6 @@ import TotalHoursCount from "./TotalHoursCount";
 import { Link } from "react-router-dom";
 import { jsPDF } from "jspdf";
 
-const useStyles = makeStyles((theme) => ({
-  cardGrid: {
-    paddingTop: theme.spacing(8),
-    paddingBottom: theme.spacing(8),
-  },
-
-  media: {
-    height: 140,
-  },
-  paper: {
-    padding: theme.spacing(2),
-    color: theme.palette.text.secondary,
-    textAlign: "center",
-  },
-  large: {
-    width: theme.spacing(23.6),
-    height: theme.spacing(23.6),
-  },
-}));
 
 function SingleTimeCard({ match, auth: { isAuthenticated, user } }) {
   const dispatch = useDispatch();
@@ -57,7 +38,7 @@ function SingleTimeCard({ match, auth: { isAuthenticated, user } }) {
     dispatch(getTimecard(match.params.id));
   }, [dispatch, match.params.id]);
 
-  const classes = useStyles();
+
   const [toggleMonday, setToggleMonday] = useState(false);
   const [toggleTuesday, setToggleTuesday] = useState(false);
   const [toggleWenedsday, setToggleWenedsday] = useState(false);

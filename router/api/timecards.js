@@ -149,7 +149,7 @@ router.put(
     check(
       "description",
       "Describe what you worked on a task is required"
-    ).isLength({ max: 1000 }),
+    ).isLength({ max: 500 }),
   ],
   async (req, res) => {
     const errors = validationResult(req);
@@ -198,7 +198,7 @@ router.post(
     check(
       "description",
       "Description must not be more than 1000 characters"
-    ).isLength({ max: 1000 }),
+    ).isLength({ max: 500 }),
   ],
   async (req, res) => {
     const errors = validationResult(req);

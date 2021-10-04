@@ -17,6 +17,8 @@ import FormControl from "@material-ui/core/FormControl";
 import { connect } from "react-redux";
 import { addTimecard } from "../../actions/timecards";
 import { animations } from "react-animation";
+import CKEditor from '@ckeditor/ckeditor5-build-classic';
+import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
 const useStyles = makeStyles((theme) => ({
   root: {
     display: "flex",
@@ -184,7 +186,7 @@ function AddTimeCard({ addTimecard }) {
                 <InputLabel htmlFor="activity-description">
                   Activity Description
                 </InputLabel>
-                <OutlinedInput
+                {/*<OutlinedInput
                   id="activity-description"
                   multiline
                   rows={4}
@@ -192,6 +194,13 @@ function AddTimeCard({ addTimecard }) {
                   labelWidth={140}
                   name="description"
                   value={description}
+                  onChange={(e) => onChange(e)}
+                />*/}
+
+                <CKEditor
+                  editor={ClassicEditor}
+                  data="<p>Hello from CKEditor 5!</p>"
+                  onInit={description}
                   onChange={(e) => onChange(e)}
                 />
               </FormControl>

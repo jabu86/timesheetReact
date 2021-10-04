@@ -29,9 +29,9 @@ function MondayForm({ timecard_id, addTimecardMonday, status }) {
         <Fade>
           {" "}
           <Form
-            className="mb-2"
+            className="mb-2 text-left"
             onSubmit={(e) => onSubmit(e)}
-            className="text-left"
+            
           >
             <Form.Group controlId="hours">
               <Form.Label>Time in hours to span on a task</Form.Label>

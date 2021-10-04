@@ -17,7 +17,7 @@ import HighlightOffIcon from "@material-ui/icons/HighlightOff";
 import TimeToLeave from "@material-ui/icons/Timelapse";
 import ViewWeekIcon from "@material-ui/icons/ViewWeek";
 import { Button, IconButton } from "@material-ui/core";
-import TextTruncate from "react-text-truncate";
+//import TextTruncate from "react-text-truncate";
 import Fade from "react-reveal/Flip";
 const useStyles = makeStyles((theme) => ({
   cardGrid: {
@@ -74,11 +74,23 @@ function AllTimeCards({
     approveTimecard(status, id, total);
   };
 
+    const truncateText = (text) => {
+        const newString = text.substring(0, 50);
+        return `${newString}...`;
+    //const stringLength = 50;
+    //  if (text.length > stringLength) {
+    //      const newString = text.substring(0, stringLength);
+    //      return `${newString}...`;
+    //      //  console.log(text.substring(0, stringLength));
+    //  } else {
+    //      return text;
+    //  }
+  };
   return (
     <Fragment>
       <Grid item xs={12} sm={6} md={4}>
         <Fade bottom cascade>
-          <Card className={classes.card} style={{height:'50vh'}}>
+          <Card className={classes.card} style={{ minHeight: "70vh" }}>
             <Fade bottom cascade>
               {" "}
               <Grid container spacing={0}>
@@ -134,21 +146,23 @@ function AllTimeCards({
               </Grid>
               <CardContent className={classes.cardContent}>
                 <Typography component="p">
-                  <TextTruncate
+                  {truncateText(timecard.description)}
+                  {/*<TextTruncate
                     line={1}
                     element="span"
                     truncateText="…"
                     text={timecard.description}
                     textTruncateChild={
-                      <Button
-                        size="small"
-                        color="primary"
-                        href={"/timecard/" + timecard._id}
-                      >
-                        Learn More
-                      </Button>
+
                     }
-                  />
+                  />*/}
+                  <Button
+                    size="small"
+                    color="primary"
+                    href={"/timecard/" + timecard._id}
+                  >
+                    Learn More
+                  </Button>
                 </Typography>
                 <Typography style={{ float: "right" }}>
                   <small>

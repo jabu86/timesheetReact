@@ -45,7 +45,7 @@ export const getUsers = () => async (dispatch) => {
       payload: res.data,
     });
   } catch (err) {
-    console.log(err);
+  //  console.log(err);
     dispatch({
       type: USERS_ERROR,
       payload: {
@@ -162,7 +162,7 @@ export const imageUpload = (file, _id) => async (dispatch) => {
         "Content-Type": "multipart/form-data",
       },
     });
-    const { fileName, filePath } = res.data;
+   // const { fileName, filePath } = res.data;
     dispatch(setAlert(res.data.msg, "success", 2000));
     dispatch({
       type: IMAGE_UPLOAD_SUSSESS,
